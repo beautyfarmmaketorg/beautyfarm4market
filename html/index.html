@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+  <title>纯新胶原精华护理</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+      <main>
+        <a class="btn-purchase" href="javascript:;" onclick="alertPurchase()"></a>
+        <a class="btn-rules" href="javascript:;" onclick="alertRules()"></a>
+        <!-- Dialog for rules info -->
+        <div id="alert-rules" class="alert alert-rules mask">
+          <div class="alert-content">
+            <p class="title">活动规则</p>
+            <div class="desc">
+
+              <p>1.客人点击立即购买后弹窗，输入手机获取验证码，如判断为会员则无法接收验证码并且提示不可购买，判断为非会员则获取验证码并购买成功</p>
+
+              <p>2.购买成功的订单信息需要发送至CAM账户（通过CAM接口）</p>
+            </div>
+          </div>
+          <a href="javascript:;" id="closeRules" class="btn btn-close" onclick="closeRules()">✕</a>
+        </div>
+        <!-- /Dialog for rules info -->
+
+        <!-- Dialog for purchase -->
+        <div id="alert-purchase" class="alert-purchase mask">
+        	<form>
+        		<div class="form-inline">
+        			<div class="form-group">
+        				<label for="username">姓&nbsp;&nbsp;&nbsp;名：</label>
+        				<input type="text" class="form-control" id="username" placeholder="">
+        			</div>
+        			<div class="form-group">
+        				<label for="username">手&nbsp;&nbsp;&nbsp;机：</label>
+        				<input type="tel" class="form-control" id="phone" placeholder="">
+        			</div>
+        			<div class="form-group">
+        				<label for="username" class="pull-left">验证码：&nbsp;</label>
+        				<input type="text" class="form-control" id="code" placeholder="">
+        				<a class="btn btn-primary btn-code pull-left" href="#">获取验证码</a>
+        			</div>
+        		</div>
+        		<!-- <input type="submit" class="btn btn-submit" value="确认购买" onclick='alertSuccess()' /> -->
+            <a href="javascript:;" class="btn btn-submit" onclick="alertSuccess()">确认购买</a>
+        	</form>
+        	<a href="javascript:;" class="btn btn-close" onclick="closePurchase()">✕</a>
+        </div>
+        <!-- /Dialog for purchase -->
+
+        <!-- Dialog for purchase succeed -->
+        <div id="alert-success" class="alert alert-success mask">
+        	<div class="alert-content">
+            <span class="icon-ok">✔</span>
+            <p class="txt">恭喜您购买成功</p>
+            <p class="desc">购买信息稍后会以短信的方式发送至您的手机</p>
+            <a href="javascript:;" class="btn btn-primary btn-ok" onclick="closeSuccess()">OK</a>
+          </div>
+        </div>
+        <!-- /Dialog for purchase succeed -->
+
+        <!-- Dialog for remind the member -->
+        <div class="alert alert-info mask" id="alert-info">
+          <div class="alert-content">
+            <p class="title">提示：</p>
+            <p class="tips">尊敬的会员您好！</p>
+            <p class="desc">本活动仅限非美丽田园会员参与</p>
+            <a href="javascript:;" class="btn btn-primary btn-ok" onclick="closeInfo()">确定</a>
+          </div>
+        </div>
+        <!-- /Dialog for remind the member -->
+
+        <!-- Dialog for second purchase -->
+        <div class="alert alert-info mask" id="alert-info2">
+          <div class="alert-content">
+            <p class="title">提示：</p>
+            <p class="tips">您已购买过此护理</p>
+            <p class="desc">请直接致电 <em>4008206142</em> 预约到店体验。</p>
+            <a href="javascript:;" id="closeInfo2" class="btn btn-primary btn-ok" onclick="closeInfo2()">确定</a>
+          </div>
+        </div>
+        <!-- /Dialog for second purchase -->
+      </main>
+      <script>
+        var obj_pur = document.getElementById('alert-purchase');
+        var obj_suc = document.getElementById('alert-success');
+        var obj_rules = document.getElementById('alert-rules');
+        var obj_info = document.getElementById('alert-info');
+        var obj_info2 = document.getElementById('alert-info2');
+
+      	function alertPurchase(){
+          addClass(obj_pur,"show");  
+      	}
+      	function closePurchase(){
+          removeClass(obj_pur,"show");  
+      	}
+      	function alertSuccess(){
+          removeClass(obj_pur,"show");
+      		addClass(obj_suc,"show"); 
+          
+      	}
+        function closeSuccess(){
+          removeClass(obj_suc,"show"); 
+          addClass(obj_info2,"show")
+        }
+        function alertRules(){
+          addClass(obj_rules,"show"); 
+        }
+        function closeRules(){
+          removeClass(obj_rules,"show"); 
+        }
+        function closeInfo(){
+          removeClass(obj_info,"show"); 
+        }
+        function closeInfo2(){
+          removeClass(obj_info2,"show"); 
+          addClass(obj_info,"show"); 
+        }
+
+        function hasClass(obj, cls) {  
+          return obj.className.match(new RegExp('(\\s|^)' + cls + '(\\s|$)'));  
+        }
+        function addClass(obj, cls) {  
+          if (!this.hasClass(obj, cls)) obj.className += " " + cls;  
+        }  
+
+        function removeClass(obj, cls) {  
+          if (hasClass(obj, cls)) {  
+            var reg = new RegExp('(\\s|^)' + cls + '(\\s|$)');  
+            obj.className = obj.className.replace(reg, ' ');  
+          }  
+        }  
+
+        function toggleClass(obj,cls){  
+          if(hasClass(obj,cls)){  
+            removeClass(obj, cls);  
+          }else{  
+            addClass(obj, cls);  
+          }  
+        }  
+      </script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+*{margin: 0;padding: 0;-webkit-tap-highlight-color: rgba(0,0,0,0);  }
+html,body{height: 100%}
+body{font: 14px PingFangSC-Regular;color: #59504D}
+body,main::before{background: url(../images/bg.jpg) no-repeat center center;background-size: 100% 100%;}
+main{position: relative;width: 100%;height: 100%;overflow: hidden; }
+a{text-decoration: none;color: inherit;}
+input{border:0;outline: none;}
+.btn{display: block;}
+.btn-primary{border-radius: 5px; color: #fff;background: #addef3;}
+.mask{position: absolute;width: 100%;height: 100%; z-index: 11;background: url(../images/mask.jpg) no-repeat center center;background-size: 100% 100%;}
+.pull-left{float: left;}
+/*.hide{ }*/
+div.show{display: block;opacity: 1}
+.alert{display: none;opacity: 0;transition:opacity 2s;}
+.alert-content{width: 74%;border-radius: 5px;background: #fff;position: absolute;top:26%;left: 50%;margin-left: -36%;z-index: 12;text-align: center;}
+.tips{font-weight: 700;font-size: 18px;margin-bottom: 10px}
+.desc{font-size: 12px;color: #8A8882}
+
+/*style for index.html*/
+.btn-purchase{ bottom: 25%;left: 50%;margin-left: -27px; width: 55px;height: 80px; background: url(../images/button.png) no-repeat center center;}
+.btn-rules{top: 30px;right: 0; width: 72px;height: 36px; background: url(../images/rules.png) no-repeat center center;}
+.btn-purchase,.btn-rules{position: absolute;background-size: 100% 100%;z-index: 9}
+
+/*style for purchase-info.html*/
+.alert-purchase{display: none;opacity: 0;}
+.alert-purchase form{width: 280px; position: absolute;top:26%;left: 50%;margin-left: -140px;z-index: 12}
+.form-inline{background: url(../images/purchase-bg.png) no-repeat center center;background-size: 100% 100%; width: 100%;height: 230px}
+
+.form-group{width: 83%;margin: 0 auto; border-bottom: 1px solid #e6e6e6;margin-bottom: 10%;overflow: hidden;}
+.form-group:first-child{padding-top: 15%}
+.form-group:last-child{position: relative;margin-bottom: 0;height: 40px;line-height: 40px}
+.form-group input{height: 25px; margin-top:5px;font-size: 12px}
+.btn-code{height: 32px;line-height: 32px;padding: 0 5px; font-size: 12px;position: absolute;right: 0;top: 3px}
+.btn-close{position: absolute;top: 15%;right: 7%;display: block;width: 28px;height: 28px;font-size:18px;text-align: center;border:1px solid #fff;border-radius: 50%;color: #fff;background: rgba(245,234,234,.1);line-height: 28px;z-index: 13}
+.btn-submit{margin:40px auto;width: 130px;text-align: center;height: 35px;line-height: 35px;border: 0; background: url(../images/submit-bg.png) no-repeat center center;background-size: 100% 100%; font-size: 16px;color: #fff}
+
+/*style for purchase-succeed.html*/
+
+.alert-success .desc{width: 98%;margin: 15px auto 0}
+.icon-ok{display: block;width: 50px;height: 50px;line-height: 50px;margin: 25px auto;border: 1px solid #e2f2d4;border-radius: 50%;font-size: 36px; color: #a0d372;font-weight: 700}
+.btn-ok{height: 40px;line-height: 40px;width: 80px;margin: 28px auto}
+
+/*style for member-reminder.html*/
+.alert-info .title{height: 30px;line-height: 30px;margin-bottom: 30px; border-bottom: 2px solid #addef3;text-indent: 1em;text-align: left;}
+
+
+/*style for rules-detail.html*/
+.alert-rules .title{background:#94E1FF;text-align: center;text-shadow:1px 1px 1px #ddd;height: 40px;line-height: 40px;font-size: 18px;font-weight: 700;color: #fff; border-top-right-radius: 5px;border-top-left-radius: 5px; }
+.alert-rules .desc{width: 100%;height: 240px; margin: 10px auto;background: url(../images/rules-bg.jpg) no-repeat top center; background-size: 100% 50%; font-size: 14px;color: inherit; text-align:justify;}
+.alert-rules .desc p{padding: 10px 30px}
+
+/*style for second-purchase.html*/
+.alert em{font-style: normal;color: #59504D;font-weight: 700}
