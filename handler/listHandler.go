@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 	"io/ioutil"
-	"io"
+	"beautyfarm4market/util"
 )
 
 func ListHandler(w http.ResponseWriter,r *http.Request) {
@@ -12,11 +12,15 @@ func ListHandler(w http.ResponseWriter,r *http.Request) {
 		http.Error(w,err.Error(),http.StatusInternalServerError)
 		return
 	}
-
-	var listHtml string
+	locals:=make(map[string]interface{})
+	imageArr:=[]string{}
 	for _,fileInfo:=range fileInfoArr{
 		imgid :=fileInfo.Name()
-		listHtml+="<li><a href=\"/view?id="+imgid+"\">"+imgid+"</a></li>"
+		imageArr = append(imageArr,imgid)
 	}
-	io.WriteString(w,"<html><body><ol>"+listHtml+"</ol></body></html>")
+	locals["images"] = imageArr
+	if err:=util.RenderHtml(w,"list.html",locals);err!=nil{
+		http.Error(w,err.Error(),http.StatusInternalServerError)
+	}
+	return
 }

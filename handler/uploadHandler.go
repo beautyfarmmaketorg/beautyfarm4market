@@ -4,14 +4,12 @@ import (
 	"net/http"
 	"io"
 	"os"
+	"beautyfarm4market/util"
 )
 
 func UploadHandler(w http.ResponseWriter,r *http.Request)  {
 	if r.Method == "GET" {
-		io.WriteString(w,"<html><head><title>上传照片</title></head><body> <form method=\"post\" action=\"/upload\""+
-			" enctype =\"multipart/form-data\">"+
-				" Chose an image to upload :<input name=\"image\" type=\"file\" />"+
-					"<input type=\"submit\" value=\"upload\"/></form></body></html>")
+		util.RenderHtml(w,"upload.html",nil)
 		return
 	}
 
