@@ -2,9 +2,13 @@ package handler
 
 import (
 	"net/http"
-	"io"
+	"beautyfarm4market/util"
 )
 
 func IndexHandler(w http.ResponseWriter,r *http.Request)  {
-	io.WriteString(w,"hello,world!")
+	if r.Method=="GET" {
+		util.RenderHtml(w,"index.html",nil)
+		return
+	}
+	return
 }

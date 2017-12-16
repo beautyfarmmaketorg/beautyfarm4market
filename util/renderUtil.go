@@ -5,12 +5,10 @@ import (
 	"html/template"
 	"io/ioutil"
 	"path"
-	"log"
+	//"log"
 )
 
-const(
-	VIEW_DRI = "/beautyfarm4market/html/"
-)
+var VIEW_DRI string = "/beautyfarm4market/html/"
 
 var tempaltes =make(map[string]*template.Template)
 
@@ -28,7 +26,7 @@ func init()  {
 			continue
 		}
 		templatePath=absoluteViewsDir+templateName
-		log.Printf("loading path",templatePath)
+		//log.Printf("loading path",templatePath)
 		t:=template.Must(template.ParseFiles(templatePath))
 		tempaltes[templateName] = t
 	}
