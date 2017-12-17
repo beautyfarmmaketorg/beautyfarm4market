@@ -4,6 +4,7 @@ import (
 	"beautyfarm4market/handler"
 	"net/http"
 	"log"
+	_"beautyfarm4market/config"
 )
 
 
@@ -15,9 +16,12 @@ func main()  {
 	mux.HandleFunc("/view",handler.SafeHandler(handler.ViewHandler))
 	mux.HandleFunc("/list",handler.SafeHandler(handler.ListHandler))
 	mux.HandleFunc("/sendMsg",handler.SafeHandler(handler.MessageHandler))
+	mux.HandleFunc("/addOrder",handler.SafeHandler(handler.AddOrderHandler))
 	err:=http.ListenAndServe(":8099",mux)
 	if err!=nil {
 		log.Fatal("ListenAndServe: ",err.Error())
 	}
 }
+
+
 

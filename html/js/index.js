@@ -17,7 +17,17 @@ $(function () {
     
     $("#purchaseBtn").click(function () {
         if(!dataCheck())return;
-        alert("购买成功！")
+        var username = $("#username").val();
+        var mobileNo = $("#phone").val();
+        var code = $("#code").val();
+        $.post("/addOrder",{"username":username,"mobileNo":mobileNo,"code":code},function(res){
+            if(res.isSucess){
+                var sucessAlert= $("#alert-success");
+                sucessAlert.addClass("show");
+            }else {
+                showErrMsg(res.message);
+            }
+        });
     })
     
     function dataCheck() {
