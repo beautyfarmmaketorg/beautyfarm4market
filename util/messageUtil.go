@@ -9,10 +9,10 @@ import (
 	"strconv"
 )
 
-func SendMsg(content string)bool {
+func SendMsg(mobile string,content string)bool {
 	isSucess:=false
 	hex:=toHex(content)
-	response,err:=http.Get("http://esms10.10690007.net/sms/mt?command=MT_REQUEST&spid=9508&sppassword=16r8XYC3&da=8618221647820&dc=15&sm="+hex)
+	response,err:=http.Get("http://esms10.10690007.net/sms/mt?command=MT_REQUEST&spid=9508&sppassword=16r8XYC3&da=86"+mobile+"&dc=15&sm="+hex)
 	if err==nil {
 		defer response.Body.Close()
 		if body,err:=ioutil.ReadAll(response.Body);err==nil {

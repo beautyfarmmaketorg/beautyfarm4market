@@ -6,12 +6,11 @@ $(function () {
             showErrMsg("请填写手机号码");
             return
         }
-        $.get("/sendMsg",{"mobileNo":mobileNo},function(data){
-            res = JSON.parse(data);
-            if(res.isOk){
-                showSucessMsg("短信发送成功，请查看手机获取");
+        $.get("/sendMsg",{"mobileNo":mobileNo},function(res){
+            if(res.isSucess){
+                showSucessMsg(res.message);
             }else {
-                showErrMsg("短信发送失败，请稍后重试");
+                showErrMsg(res.message);
             }
         });
    });
