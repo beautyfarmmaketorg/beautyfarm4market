@@ -1,17 +1,13 @@
 package util
 
 import (
-	"os/exec"
 	"os"
-	"strings"
+	"path/filepath"
 )
 
 func GetCurrentPath()string{
-	s,err := exec.LookPath(os.Args[0])
-	CheckErr(err)
-	i := strings.LastIndex(s,"\\")
-	path:=string(s[0:i+1])
-	return path
+	execpath, _ := os.Executable() // 获得程序路径
+	return filepath.Dir(execpath)
 }
 
 

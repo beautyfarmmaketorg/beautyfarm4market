@@ -8,7 +8,7 @@ import (
 	//"log"
 )
 
-var VIEW_DRI string = "/beautyfarm4market/html/"
+var VIEW_DRI string = "/html/"
 
 var tempaltes =make(map[string]*template.Template)
 

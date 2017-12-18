@@ -7,7 +7,7 @@ import (
 
 const (
 	ListDir = 0x0001
-    VIEW_DRI = "/beautyfarm4market/html/"
+    VIEW_DRI = "/html/"
 )
 
 func StaticDirHandler(mux *http.ServeMux,prefix string,flags int )  {
