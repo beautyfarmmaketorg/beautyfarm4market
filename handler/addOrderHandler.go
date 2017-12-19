@@ -9,6 +9,7 @@ import (
 	"beautyfarm4market/config"
 	"time"
 	"strconv"
+	"beautyfarm4market/dal"
 )
 
 func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
@@ -16,7 +17,7 @@ func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
 	result := entity.GetBaseSucessRes();
 	username := r.FormValue("username")
 	mobileNo := r.FormValue("mobileNo")
-	code := r.FormValue("code")
+	//code := r.FormValue("code")
 	productCode := r.FormValue("productCode")
 	//检查是否已经下过订单
 	if hasOrdered := checkHasOrdered(mobileNo, productCode); hasOrdered {
@@ -34,7 +35,8 @@ func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
 
 	//闪客且没有下过订单
 	accountNo, _ := getAccountNo(mobileNo, username)
-	mappingOrderNo, result := addTempOrder(username, mobileNo, code, accountNo) //正式订单
+	mappingOrderNo, result := addTempOrder(username, mobileNo, config.ConfigInfo.ProductCode,
+		config.ConfigInfo.ProductName, accountNo, 1) //正式订单
 	if mappingOrderNo != "" {
 		result.Code = "3" //成功下单跳转支付
 	}
@@ -45,9 +47,23 @@ func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 //添加临时单
-func addTempOrder(userName string, mobile string, productCode string, accountNo string) (mappingOrderNo string, res entity.BaseResultEntity) {
-	mappingOrderNo = getMappingOrderNo()
+func addTempOrder(userName string, mobile string, productCode string,productName string, accountNo string, channel int) (mappingOrderNo string, res entity.BaseResultEntity) {
 	res = entity.GetBaseSucessRes()
+	mappingOrderNo = getMappingOrderNo()
+	t := dal.TempOrder{
+		MappingOrderNo: mappingOrderNo,
+		UserName:       userName,
+		MobileNo:       mobile,
+		ProductCode:    productCode,
+		AccountNo:      accountNo,
+		Channel:        channel,
+		CreateDate:     time.Now(),
+		ModifyDate:     time.Now(),
+		TotalPrice:     1,
+		ProductName:    config.ConfigInfo.ProductName,
+	}
+	isSucess := dal.AddTempOrder(t)
+	res.IsSucess = isSucess
 	return
 }
 

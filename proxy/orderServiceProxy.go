@@ -6,17 +6,17 @@ import (
 	"fmt"
 )
 
-func AddSoaOrder(mappingOrderNo string,accountNo string) (soaAddOrderResOut SoaAddOrderRes, baseResultEntity entity.BaseResultEntity) {
+func AddSoaOrder(mappingOrderNo string, accountNo string) (soaAddOrderResOut SoaAddOrderRes, baseResultEntity entity.BaseResultEntity) {
 	var soaAddOrderRes SoaAddOrderRes
-	soaAddOrderReq := getSoaAddOrderReq(mappingOrderNo,accountNo)
-	url:=fmt.Sprintf(config.ConfigInfo.OrderServiceUrl,config.ConfigInfo.AddOrderUrl)
+	soaAddOrderReq := getSoaAddOrderReq(mappingOrderNo, accountNo)
+	url := fmt.Sprintf(config.ConfigInfo.OrderServiceUrl, config.ConfigInfo.AddOrderUrl)
 	baseResultEntity = httpPostProxy(url, soaAddOrderReq, &soaAddOrderRes)
 	soaAddOrderResOut = soaAddOrderRes
 	return
 }
 
 //获取下单请求
-func getSoaAddOrderReq(mappingOrderNo string,accountNo string) SoaOrderDetai {
+func getSoaAddOrderReq(mappingOrderNo string, accountNo string) SoaOrderDetai {
 	soaAddOrderReq := SoaOrderDetai{
 		AppId:          config.ConfigInfo.OrderServiceAppId,
 		ModifyType:     "1",
@@ -29,8 +29,8 @@ func getSoaAddOrderReq(mappingOrderNo string,accountNo string) SoaOrderDetai {
 			{
 				DetailListNo: "01",
 				ProdCategory: "32",
-				ProdNo:       "1110300002",
-				ProdName:     "纯新胶原精华护理",
+				ProdNo:       config.ConfigInfo.ProductCode,
+				ProdName:     config.ConfigInfo.ProductName,
 				ProdUnit:     "件",
 				OrderQty:     "1",
 				ProdPrice:    "1",
@@ -54,14 +54,14 @@ func getSoaAddOrderReq(mappingOrderNo string,accountNo string) SoaOrderDetai {
 
 //订单服务共有请求字段
 type SoaBaseReq4Orderservice struct {
-	AppId string  `json:"appId"`
+	AppId string `json:"appId"`
 }
 
 //订单服务共有响应字段
 type SoaBaseRes4Orderservice struct {
-	Status      int `json:"status"`
-	ErrorCode      string `json:"errorCode"`
-	ErrorMessage   string `json:"errorMessage"`
+	Status       int    `json:"status"`
+	ErrorCode    string `json:"errorCode"`
+	ErrorMessage string `json:"errorMessage"`
 }
 
 //下单接口请求实体
@@ -110,18 +110,18 @@ type SoaPayInfoDetail struct {
 }
 
 //serverRes http请求结果
-func GetSoaOrderDetail(orderNo string)(soaGetOrderDetailResOut SoaGetOrderDetailRes, serverRes entity.BaseResultEntity)  {
+func GetSoaOrderDetail(orderNo string) (soaGetOrderDetailResOut SoaGetOrderDetailRes, serverRes entity.BaseResultEntity) {
 	var soaGetOrderDetailRes SoaGetOrderDetailRes
-	methodUrl:=fmt.Sprintf(config.ConfigInfo.OrderServiceUrl,config.ConfigInfo.GetOrderDetailUrl)
-	url:=fmt.Sprintf(methodUrl,orderNo,config.ConfigInfo.OrderServiceAppId)
-	serverRes= httpGetProxy(url, &soaGetOrderDetailRes)
+	methodUrl := fmt.Sprintf(config.ConfigInfo.OrderServiceUrl, config.ConfigInfo.GetOrderDetailUrl)
+	url := fmt.Sprintf(methodUrl, orderNo, config.ConfigInfo.OrderServiceAppId)
+	serverRes = httpGetProxy(url, &soaGetOrderDetailRes)
 	soaGetOrderDetailResOut = soaGetOrderDetailRes
 	return
 }
 
 type OrderDetailInfo struct {
 	OrderList []SoaProductDetail `json:"orderList"`
-} 
+}
 
 type SoaGetOrderDetailRes struct {
 	SoaBaseRes4Orderservice
@@ -131,9 +131,9 @@ type SoaGetOrderDetailRes struct {
 //账户注册
 func AddSoaAccount(accountRegisterReq AccountRegisterReq) (accountRegisterResOut AccountRegisterRes, baseResultEntity entity.BaseResultEntity) {
 	var accountRegisterRes AccountRegisterRes
-	accountRegisterReq.AppId=config.ConfigInfo.OrderServiceAppId
-	accountRegisterReq.RegisterChannelType=config.ConfigInfo.RegisterChannelType
-	url:=fmt.Sprintf(config.ConfigInfo.OrderServiceUrl,config.ConfigInfo.AccountRegisterUrl)
+	accountRegisterReq.AppId = config.ConfigInfo.OrderServiceAppId
+	accountRegisterReq.RegisterChannelType = config.ConfigInfo.RegisterChannelType
+	url := fmt.Sprintf(config.ConfigInfo.OrderServiceUrl, config.ConfigInfo.AccountRegisterUrl)
 	baseResultEntity = httpPostProxy(url, accountRegisterReq, &accountRegisterRes)
 	accountRegisterResOut = accountRegisterRes
 	return
@@ -141,8 +141,8 @@ func AddSoaAccount(accountRegisterReq AccountRegisterReq) (accountRegisterResOut
 
 type AccountRegisterReq struct {
 	SoaBaseReq4Orderservice
-	Name string `json:"name"`
-	Phone string  `json:"phone"`
+	Name                string `json:"name"`
+	Phone               string `json:"phone"`
 	RegisterChannelType string `json:"registerChannelType"`
 }
 
@@ -158,15 +158,16 @@ type SoaGetAccountInfoRes struct {
 
 type AccountInfo struct {
 	AccountNo string `json:"accountNo"`
-	Name string `json:"name"`
-	Phone string `json:"phone"`
+	Name      string `json:"name"`
+	Phone     string `json:"phone"`
 }
+
 //serverRes http请求结果
-func GetSoaAccountInfo(mobileNo string)(soaGetAccountInfoResOut SoaGetAccountInfoRes, serverRes entity.BaseResultEntity)  {
+func GetSoaAccountInfo(mobileNo string) (soaGetAccountInfoResOut SoaGetAccountInfoRes, serverRes entity.BaseResultEntity) {
 	var soaGetAccountInfoRes SoaGetAccountInfoRes
-	methodUrl:=fmt.Sprintf(config.ConfigInfo.OrderServiceUrl,config.ConfigInfo.GetAccountInfoUrl)
-	url:=fmt.Sprintf(methodUrl,mobileNo)
-	serverRes= httpGetProxy(url, &soaGetAccountInfoRes)
+	methodUrl := fmt.Sprintf(config.ConfigInfo.OrderServiceUrl, config.ConfigInfo.GetAccountInfoUrl)
+	url := fmt.Sprintf(methodUrl, mobileNo)
+	serverRes = httpGetProxy(url, &soaGetAccountInfoRes)
 	soaGetAccountInfoResOut = soaGetAccountInfoRes
 	return
 }

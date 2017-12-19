@@ -24,6 +24,8 @@ type configEntity struct {
 	AppSecret           string
 	IsVipUrl            string
 	SignTemplate        string
+	ProductCode         string
+	ProductName         string
 }
 
 func init() {
@@ -49,6 +51,8 @@ func init() {
 		SignTemplate:        "appid=%s&secretkey=%s&timestamp=%d",
 		PosServiceAppId:     "bf_market",
 		AppSecret:           "Vit+HmAG8a+7JCyIEPmR5A==",
+		ProductCode:"1110300002",
+		ProductName:"纯新胶原精华护理",
 	}
 	fmt.Printf("init Config")
 }
