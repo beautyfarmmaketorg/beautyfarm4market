@@ -6,9 +6,9 @@ import (
 	"fmt"
 )
 
-func AddSoaOrder(mappingOrderNo string) (soaAddOrderResOut SoaAddOrderRes, baseResultEntity entity.BaseResultEntity) {
+func AddSoaOrder(mappingOrderNo string,accountNo string) (soaAddOrderResOut SoaAddOrderRes, baseResultEntity entity.BaseResultEntity) {
 	var soaAddOrderRes SoaAddOrderRes
-	soaAddOrderReq := getSoaAddOrderReq(mappingOrderNo)
+	soaAddOrderReq := getSoaAddOrderReq(mappingOrderNo,accountNo)
 	url:=fmt.Sprintf(config.ConfigInfo.OrderServiceUrl,config.ConfigInfo.AddOrderUrl)
 	baseResultEntity = httpPostProxy(url, soaAddOrderReq, &soaAddOrderRes)
 	soaAddOrderResOut = soaAddOrderRes
@@ -16,12 +16,12 @@ func AddSoaOrder(mappingOrderNo string) (soaAddOrderResOut SoaAddOrderRes, baseR
 }
 
 //获取下单请求
-func getSoaAddOrderReq(mappingOrderNo string) SoaOrderDetai {
+func getSoaAddOrderReq(mappingOrderNo string,accountNo string) SoaOrderDetai {
 	soaAddOrderReq := SoaOrderDetai{
 		AppId:          config.ConfigInfo.OrderServiceAppId,
 		ModifyType:     "1",
 		MappingOrderNo: mappingOrderNo,
-		AccountNo:      config.ConfigInfo.AccountNo,
+		AccountNo:      accountNo,
 		Channel:        config.ConfigInfo.Channel,
 		OrderType:      "2",
 		OrderStatus:    "6",
@@ -54,7 +54,7 @@ func getSoaAddOrderReq(mappingOrderNo string) SoaOrderDetai {
 
 //订单服务共有请求字段
 type SoaBaseReq4Orderservice struct {
-
+	AppId string  `json:"appId"`
 }
 
 //订单服务共有响应字段
@@ -125,4 +125,27 @@ type OrderDetailInfo struct {
 type SoaGetOrderDetailRes struct {
 	SoaBaseRes4Orderservice
 	OrderList []SoaOrderDetai `json:"orderList"`
+}
+
+//账户注册
+func AddSoaAccount(accountRegisterReq AccountRegisterReq) (accountRegisterResOut AccountRegisterRes, baseResultEntity entity.BaseResultEntity) {
+	var accountRegisterRes AccountRegisterRes
+	accountRegisterReq.AppId=config.ConfigInfo.OrderServiceAppId
+	accountRegisterReq.RegisterChannelType=config.ConfigInfo.RegisterChannelType
+	url:=fmt.Sprintf(config.ConfigInfo.OrderServiceUrl,config.ConfigInfo.AccountRegisterUrl)
+	baseResultEntity = httpPostProxy(url, accountRegisterReq, &accountRegisterRes)
+	accountRegisterResOut = accountRegisterRes
+	return
+}
+
+type AccountRegisterReq struct {
+	SoaBaseReq4Orderservice
+	Name string `json:"name"`
+	Phone string  `json:"phone"`
+	RegisterChannelType string `json:"registerChannelType"`
+}
+
+type AccountRegisterRes struct {
+	SoaBaseRes4Orderservice
+	AccountNo string `json:"accountNo"`
 }

@@ -15,14 +15,32 @@ func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	mobileNo := r.FormValue("mobileNo")
 	code := r.FormValue("code")
-	result := addFinalOrder(username, mobileNo, code) //正式订单
+
+	accountNo := IsNewUser(mobileNo, username)
+	if accountNo == "" {
+		accountNo = config.ConfigInfo.AccountNo
+	}
+	result := addFinalOrder(username, mobileNo, code, accountNo) //正式订单
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
 	json.NewEncoder(w).Encode(result)
 	return
 }
 
+//是否是新用户 是的话则注册并且 返回accountNo用于下单
+func IsNewUser(mobile string, userName string) string {
+	accountNo := ""
+	accountRegisterReq := proxy.AccountRegisterReq{}
+	accountRegisterReq.Phone = mobile
+	accountRegisterReq.Name = userName
+	accountRegisterRes, serverRes := proxy.AddSoaAccount(accountRegisterReq)
+	if serverRes.IsSucess && accountRegisterRes.ErrorCode == "200" {
+		accountNo = accountRegisterRes.AccountNo
+	}
+	return accountNo
+}
+
 //是否是新用户
-func isNewUser(mobile string) bool {
+func isVip(mobile string) bool {
 	return false
 }
 
@@ -32,9 +50,9 @@ func hasOrdered(mobile string, productCode string) bool {
 }
 
 //下正式订单
-func addFinalOrder(userName string, mobile string, productCode string) entity.BaseResultEntity {
+func addFinalOrder(userName string, mobile string, productCode string, accountNo string) entity.BaseResultEntity {
 	result := entity.GetBaseFailRes()
-	soaAddOrderRes, serverRes := proxy.AddSoaOrder(getMappingOrderNo())
+	soaAddOrderRes, serverRes := proxy.AddSoaOrder(getMappingOrderNo(), accountNo)
 	if serverRes.IsSucess && soaAddOrderRes.ErrorCode == "200" {
 		result.IsSucess = true
 		orderNo := soaAddOrderRes.OrderNo
@@ -65,8 +83,8 @@ func sendOrderSucessMessage(orderNo string, mobileNo string) bool {
 		orderDetail := soaGetOrderDetailResOut.OrderList[0]
 		if len(orderDetail.DetailList) > 0 {
 			yuanYuNo := orderDetail.DetailList[0].CardNo
-			productName:=orderDetail.DetailList[0].ProdName
-			smsContent := fmt.Sprintf(config.ConfigInfo.SmsOfOrderSucess,productName,yuanYuNo)
+			productName := orderDetail.DetailList[0].ProdName
+			smsContent := fmt.Sprintf(config.ConfigInfo.SmsOfOrderSucess, productName, yuanYuNo)
 			proxy.SendMsg(mobileNo, smsContent)
 			return true
 		}
