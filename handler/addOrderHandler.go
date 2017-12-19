@@ -12,36 +12,80 @@ import (
 )
 
 func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json;charset=utf-8")
+	result := entity.GetBaseSucessRes();
 	username := r.FormValue("username")
 	mobileNo := r.FormValue("mobileNo")
 	code := r.FormValue("code")
-
-	accountNo := IsNewUser(mobileNo, username)
-	if accountNo == "" {
-		accountNo = config.ConfigInfo.AccountNo
+	productCode := r.FormValue("productCode")
+	//检查是否已经下过订单
+	if hasOrdered := checkHasOrdered(mobileNo, productCode); hasOrdered {
+		result.Code = "1" //
+		json.NewEncoder(w).Encode(result)
+		return
 	}
-	result := addFinalOrder(username, mobileNo, code, accountNo) //正式订单
-	w.Header().Set("Content-Type", "application/json;charset=utf-8")
+
+	//vip用户
+	if isVip := isVip(mobileNo); isVip {
+		result.Code = "2" //vip
+		json.NewEncoder(w).Encode(result)
+		return
+	}
+
+	//闪客且没有下过订单
+	accountNo, _ := getAccountNo(mobileNo, username)
+	mappingOrderNo, result := addTempOrder(username, mobileNo, code, accountNo) //正式订单
+	if mappingOrderNo != "" {
+		result.Code = "3" //成功下单跳转支付
+	}
+	//result = addFinalOrder(username, mobileNo, code, accountNo, mappingOrderNo) //正式订单
+
 	json.NewEncoder(w).Encode(result)
 	return
 }
 
+//添加临时单
+func addTempOrder(userName string, mobile string, productCode string, accountNo string) (mappingOrderNo string, res entity.BaseResultEntity) {
+	mappingOrderNo = getMappingOrderNo()
+	res = entity.GetBaseSucessRes()
+	return
+}
+
+//检查是否已经下过订单
+func checkHasOrdered(mobileNo string, productCode string) bool {
+	return false
+}
+
 //是否是新用户 是的话则注册并且 返回accountNo用于下单
-func IsNewUser(mobile string, userName string) string {
-	accountNo := ""
+func getAccountNo(mobile string, userName string) (accountNo string, isNewCreate bool) {
+	accountNo = ""
 	accountRegisterReq := proxy.AccountRegisterReq{}
 	accountRegisterReq.Phone = mobile
 	accountRegisterReq.Name = userName
 	accountRegisterRes, serverRes := proxy.AddSoaAccount(accountRegisterReq)
-	if serverRes.IsSucess && accountRegisterRes.ErrorCode == "200" {
-		accountNo = accountRegisterRes.AccountNo
+	if serverRes.IsSucess {
+		if accountRegisterRes.ErrorCode == "200" {
+			accountNo = accountRegisterRes.AccountNo
+			isNewCreate = true
+		}
+	} else if accountRegisterRes.Status == 400 {
+		//账户已存在则调用查询账户信息接口 获取AccountNo
+		getAccountInfoRes, serverRes4Account := proxy.GetSoaAccountInfo(mobile)
+		if serverRes4Account.IsSucess && len(getAccountInfoRes.AccountList) > 0 {
+			accountNo = getAccountInfoRes.AccountList[0].AccountNo
+		}
 	}
-	return accountNo
+	return
 }
 
 //是否是新用户
 func isVip(mobile string) bool {
-	return false
+	isVip := false
+	soaIsVipResOut, serverRes := proxy.IsVip(mobile)
+	if serverRes.IsSucess && soaIsVipResOut.Status == 1 {
+		isVip = soaIsVipResOut.Data.IsVip || soaIsVipResOut.Data.IsMarketVip
+	}
+	return isVip
 }
 
 //是否购买过某个产品
@@ -50,9 +94,9 @@ func hasOrdered(mobile string, productCode string) bool {
 }
 
 //下正式订单
-func addFinalOrder(userName string, mobile string, productCode string, accountNo string) entity.BaseResultEntity {
+func addFinalOrder(userName string, mobile string, productCode string, accountNo string, mappingOrderNo string) entity.BaseResultEntity {
 	result := entity.GetBaseFailRes()
-	soaAddOrderRes, serverRes := proxy.AddSoaOrder(getMappingOrderNo(), accountNo)
+	soaAddOrderRes, serverRes := proxy.AddSoaOrder(mappingOrderNo, accountNo)
 	if serverRes.IsSucess && soaAddOrderRes.ErrorCode == "200" {
 		result.IsSucess = true
 		orderNo := soaAddOrderRes.OrderNo

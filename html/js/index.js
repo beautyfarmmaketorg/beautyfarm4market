@@ -68,10 +68,24 @@ $(function () {
         var username = $("#username").val();
         var mobileNo = $("#phone").val();
         var code = $("#code").val();
+        var alertpurchase = $("#alert-purchase")
         $.post("/addOrder", {"username": username, "mobileNo": mobileNo, "code": code}, function (res) {
             if (res.isSucess) {
-                var sucessAlert = $("#alert-success");
-                sucessAlert.addClass("show");
+                if (res.code == "1") {
+                    alertpurchase.removeClass("show")
+                    var alertinfo2 = $("#alert-info2");//已经购买
+                    alertinfo2.addClass("show");
+                }
+                else if (res.code == "2") {
+                    alertpurchase.removeClass("show")
+                    var alertinfo = $("#alert-info");//vip
+                    alertinfo.addClass("show");
+                }
+                else if (res.code == "3") {
+                    alert("临时单下单成功跳转支付");
+                }
+                //var sucessAlert = $("#alert-success");
+                //sucessAlert.addClass("show");
             } else {
                 showErrMsg(res.message);
             }

@@ -39,7 +39,7 @@ func getSoaAddOrderReq(mappingOrderNo string,accountNo string) SoaOrderDetai {
 				OrderAmt:     "1",
 				PayList: []SoaPayInfoDetail{
 					{
-						PayNo:       "P000004",
+						PayNo:       mappingOrderNo,
 						PayCategory: "3",
 						PayType:     "第三方支付",
 						PayAmt:      "1",
@@ -59,6 +59,7 @@ type SoaBaseReq4Orderservice struct {
 
 //订单服务共有响应字段
 type SoaBaseRes4Orderservice struct {
+	Status      int `json:"status"`
 	ErrorCode      string `json:"errorCode"`
 	ErrorMessage   string `json:"errorMessage"`
 }
@@ -148,4 +149,24 @@ type AccountRegisterReq struct {
 type AccountRegisterRes struct {
 	SoaBaseRes4Orderservice
 	AccountNo string `json:"accountNo"`
+}
+
+type SoaGetAccountInfoRes struct {
+	SoaBaseRes4Orderservice
+	AccountList []AccountInfo `json:"accountList"`
+}
+
+type AccountInfo struct {
+	AccountNo string `json:"accountNo"`
+	Name string `json:"name"`
+	Phone string `json:"phone"`
+}
+//serverRes http请求结果
+func GetSoaAccountInfo(mobileNo string)(soaGetAccountInfoResOut SoaGetAccountInfoRes, serverRes entity.BaseResultEntity)  {
+	var soaGetAccountInfoRes SoaGetAccountInfoRes
+	methodUrl:=fmt.Sprintf(config.ConfigInfo.OrderServiceUrl,config.ConfigInfo.GetAccountInfoUrl)
+	url:=fmt.Sprintf(methodUrl,mobileNo)
+	serverRes= httpGetProxy(url, &soaGetAccountInfoRes)
+	soaGetAccountInfoResOut = soaGetAccountInfoRes
+	return
 }
