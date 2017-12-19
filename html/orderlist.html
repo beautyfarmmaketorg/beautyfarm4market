@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>订单列表</title>
+</head>
+<body>
+<table>
+    <thead>
+    <td>MappingOrderNo</td>
+    <td>ProductCode</td>
+    <td>ProductName</td>
+    <td>MobileNo</td>
+    <td>UserName</td>
+    <td>AccountNo</td>
+    <td>TotalPrice</td>
+    <td>OrderStatus</td>
+    <td>PayStatus</td>
+    <td>OrderNo</td>
+    <td>CardNo</td>
+    <td>Channel</td>
+    <td>CreateDate</td>
+    <td>ModifyDate</td>
+    </thead>
+    <tbody>
+    {{range $.orders}}
+        <tr>
+            <td>{{.MappingOrderNo}}</td>
+            <td>{{.ProductCode}}</td>
+            <td>{{.ProductName}}</td>
+            <td>{{.MobileNo}}</td>
+            <td>{{.UserName}}</td>
+            <td>{{.AccountNo}}</td>
+            <td>{{.TotalPrice}}</td>
+            <td>{{.OrderStatus}}</td>
+            <td>{{.PayStatus}}</td>
+            <td>{{.OrderNo}}</td>
+            <td>{{.CardNo}}</td>
+            <td>{{.Channel}}</td>
+            <td>{{.CreateDate}}</td>
+            <td>{{.ModifyDate}}</td>
+        </tr>
+    {{end}}
+    </tbody>
+</table>
+</body>
+</html>

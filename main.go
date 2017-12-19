@@ -17,6 +17,7 @@ func main()  {
 	mux.HandleFunc("/list",handler.SafeHandler(handler.ListHandler))
 	mux.HandleFunc("/sendMsg",handler.SafeHandler(handler.MessageHandler))
 	mux.HandleFunc("/addOrder",handler.SafeHandler(handler.AddOrderHandler))
+	mux.HandleFunc("/orderList",handler.SafeHandler(handler.OrderListHandler))
 	err:=http.ListenAndServe(":8009",mux)
 	if err!=nil {
 		log.Fatal("ListenAndServe: ",err.Error())

@@ -7,9 +7,9 @@ import (
 	"beautyfarm4market/proxy"
 	"fmt"
 	"beautyfarm4market/config"
-	"time"
 	"strconv"
 	"beautyfarm4market/dal"
+	"time"
 )
 
 func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
@@ -18,7 +18,7 @@ func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	mobileNo := r.FormValue("mobileNo")
 	//code := r.FormValue("code")
-	productCode := r.FormValue("productCode")
+	productCode := config.ConfigInfo.ProductCode // r.FormValue("productCode")
 	//检查是否已经下过订单
 	if hasOrdered := checkHasOrdered(mobileNo, productCode); hasOrdered {
 		result.Code = "1" //
@@ -47,7 +47,7 @@ func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 //添加临时单
-func addTempOrder(userName string, mobile string, productCode string,productName string, accountNo string, channel int) (mappingOrderNo string, res entity.BaseResultEntity) {
+func addTempOrder(userName string, mobile string, productCode string, productName string, accountNo string, channel int) (mappingOrderNo string, res entity.BaseResultEntity) {
 	res = entity.GetBaseSucessRes()
 	mappingOrderNo = getMappingOrderNo()
 	t := dal.TempOrder{
@@ -57,8 +57,8 @@ func addTempOrder(userName string, mobile string, productCode string,productName
 		ProductCode:    productCode,
 		AccountNo:      accountNo,
 		Channel:        channel,
-		CreateDate:     time.Now(),
-		ModifyDate:     time.Now(),
+		CreateDate:     time.Unix(time.Now().Unix(), 0).Format(config.ConfigInfo.TimeLayout),
+		ModifyDate:     time.Unix(time.Now().Unix(), 0).Format(config.ConfigInfo.TimeLayout),
 		TotalPrice:     1,
 		ProductName:    config.ConfigInfo.ProductName,
 	}
@@ -69,7 +69,8 @@ func addTempOrder(userName string, mobile string, productCode string,productName
 
 //检查是否已经下过订单
 func checkHasOrdered(mobileNo string, productCode string) bool {
-	return false
+	orders := dal.GetOrdersByMobile(mobileNo, productCode)
+	return len(orders) > 0
 }
 
 //是否是新用户 是的话则注册并且 返回accountNo用于下单
