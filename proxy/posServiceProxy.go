@@ -5,8 +5,7 @@ import (
 	"fmt"
 	"beautyfarm4market/config"
 	"time"
-	"crypto/md5"
-	"encoding/hex"
+	"beautyfarm4market/util"
 )
 
 type SoaIsVipRes struct {
@@ -39,12 +38,7 @@ func IsVip(mobileNo string) (soaIsVipResOut SoaIsVipRes, serverRes entity.BaseRe
 //   "appid=%s&secretkey=%s&timestamp=%s",
 func getSign(appId string, timeSpan int64) string {
 	original := fmt.Sprintf(config.ConfigInfo.SignTemplate, appId, config.ConfigInfo.AppSecret, timeSpan)
-	return getMd5(original)
+	return util.GetMd5(original)
 }
 
-func getMd5(orignStr string) string {
-	md5Ctx := md5.New()
-	md5Ctx.Write([]byte(orignStr))
-	cipherStr := md5Ctx.Sum(nil)
-	return hex.EncodeToString(cipherStr)
-}
+

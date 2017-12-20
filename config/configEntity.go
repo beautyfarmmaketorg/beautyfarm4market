@@ -26,6 +26,7 @@ type configEntity struct {
 	SignTemplate        string
 	ProductCode         string
 	ProductName         string
+	WeChatPayUrl        string
 }
 
 func init() {
@@ -51,8 +52,9 @@ func init() {
 		SignTemplate:        "appid=%s&secretkey=%s&timestamp=%d",
 		PosServiceAppId:     "bf_market",
 		AppSecret:           "Vit+HmAG8a+7JCyIEPmR5A==",
-		ProductCode:"1110300002",
-		ProductName:"纯新胶原精华护理",
+		ProductCode:         "1110300002",
+		ProductName:         "纯新胶原精华护理",
+		WeChatPayUrl:        "https://api.mch.weixin.qq.com/pay/unifiedorder",
 	}
 	fmt.Printf("init Config")
 }

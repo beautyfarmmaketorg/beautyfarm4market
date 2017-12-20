@@ -1,0 +1,14 @@
+<xml>
+   <appid>%s</appid>
+   <attach>%s</attach>
+   <body>%s</body>
+   <mch_id>%s</mch_id>
+   <nonce_str>%s</nonce_str>
+   <notify_url>%s</notify_url>
+   <openid>%s</openid>
+   <out_trade_no>%s</out_trade_no>
+   <spbill_create_ip>%s</spbill_create_ip>
+   <total_fee>%d</total_fee>
+   <trade_type>%s</trade_type>
+   <sign>%s</sign>
+</xml>
