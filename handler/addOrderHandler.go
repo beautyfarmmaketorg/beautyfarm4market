@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"beautyfarm4market/dal"
 	"time"
+	"strings"
 )
 
 func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
@@ -19,6 +20,15 @@ func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
 	mobileNo := r.FormValue("mobileNo")
 	//code := r.FormValue("code")
 	productCode := config.ConfigInfo.ProductCode // r.FormValue("productCode")
+	totalPrice := 1
+	clientIp := r.Header.Get("Remote_addr")
+	if (clientIp == "") {
+		clientIp = r.RemoteAddr
+	}
+	if strings.Index(clientIp, "[::1]") > -1 {
+		clientIp = "192.168.1.1"
+	}
+	fmt.Printf("clientIp:", clientIp);
 	//检查是否已经下过订单
 	if hasOrdered := checkHasOrdered(mobileNo, productCode); hasOrdered {
 		result.Code = "1" //
@@ -39,6 +49,9 @@ func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
 		config.ConfigInfo.ProductName, accountNo, 1) //正式订单
 	if mappingOrderNo != "" {
 		result.Code = "3" //成功下单跳转支付
+		xmlStr := GetPayUrl(productCode, "product", mappingOrderNo,
+			clientIp, strconv.Itoa(totalPrice))
+		fmt.Printf(xmlStr)
 	}
 	//result = addFinalOrder(username, mobileNo, code, accountNo, mappingOrderNo) //正式订单
 

@@ -27,6 +27,7 @@ type configEntity struct {
 	ProductCode         string
 	ProductName         string
 	WeChatPayUrl        string
+	WeChatKey string
 }
 
 func init() {
@@ -55,6 +56,7 @@ func init() {
 		ProductCode:         "1110300002",
 		ProductName:         "纯新胶原精华护理",
 		WeChatPayUrl:        "https://api.mch.weixin.qq.com/pay/unifiedorder",
+		WeChatKey:"meilitianyuan2016isgood2016igood",
 	}
 	fmt.Printf("init Config")
 }
