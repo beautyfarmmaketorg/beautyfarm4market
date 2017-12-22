@@ -15,18 +15,25 @@ import (
 
 func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
-	result := entity.GetBaseSucessRes();
+	result := AddOrderResponse{};
+	result.IsSucess = true
 	username := r.FormValue("username")
 	mobileNo := r.FormValue("mobileNo")
 	//code := r.FormValue("code")
 	productCode := config.ConfigInfo.ProductCode // r.FormValue("productCode")
-	totalPrice := 1
+	totalPrice := 1                              //1分钱
 	clientIp := r.Header.Get("Remote_addr")
 	if (clientIp == "") {
 		clientIp = r.RemoteAddr
 	}
 	if strings.Index(clientIp, "[::1]") > -1 {
-		clientIp = "192.168.1.1"
+		clientIp = "223.104.210.86:42425"
+	}
+	if clientIp != "" {
+		arr := strings.Split(clientIp, ":")
+		if len(arr) == 2 {
+			clientIp = arr[0]
+		}
 	}
 	fmt.Printf("clientIp:", clientIp);
 	//检查是否已经下过订单
@@ -45,18 +52,29 @@ func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
 
 	//闪客且没有下过订单
 	accountNo, _ := getAccountNo(mobileNo, username)
-	mappingOrderNo, result := addTempOrder(username, mobileNo, config.ConfigInfo.ProductCode,
+	mappingOrderNo, _ := addTempOrder(username, mobileNo, config.ConfigInfo.ProductCode,
 		config.ConfigInfo.ProductName, accountNo, 1) //正式订单
 	if mappingOrderNo != "" {
 		result.Code = "3" //成功下单跳转支付
-		xmlStr := GetPayUrl(productCode, "product", mappingOrderNo,
-			clientIp, strconv.Itoa(totalPrice))
-		fmt.Printf(xmlStr)
+		weChatUnifiedorderResponse := InvokeWeChatUnifiedorder(productCode, "product", mappingOrderNo,
+			clientIp, totalPrice, r.Host)
+		if weChatUnifiedorderResponse.ReturnCode == "SUCCESS" && weChatUnifiedorderResponse.MwebUrl != "" {
+			dal.UpdateTempOrderPayStatus(mappingOrderNo, 1) //更新支付状态
+			host := r.Host
+			if ! strings.Contains(host, "http") {
+				host = "http://" + host
+			}
+			redirect_url := host + "/purchaseRes?mappingOrderNo=" + mappingOrderNo
+			result.PayUrl = weChatUnifiedorderResponse.MwebUrl + "&redirect_url=" +redirect_url
+		}
 	}
-	//result = addFinalOrder(username, mobileNo, code, accountNo, mappingOrderNo) //正式订单
-
 	json.NewEncoder(w).Encode(result)
 	return
+}
+
+type AddOrderResponse struct {
+	entity.BaseResultEntity
+	PayUrl string
 }
 
 //添加临时单
@@ -74,6 +92,7 @@ func addTempOrder(userName string, mobile string, productCode string, productNam
 		ModifyDate:     time.Unix(time.Now().Unix(), 0).Format(config.ConfigInfo.TimeLayout),
 		TotalPrice:     1,
 		ProductName:    config.ConfigInfo.ProductName,
+		OrderStatus:    1,
 	}
 	isSucess := dal.AddTempOrder(t)
 	res.IsSucess = isSucess
@@ -118,19 +137,23 @@ func isVip(mobile string) bool {
 	return isVip
 }
 
-//是否购买过某个产品
-func hasOrdered(mobile string, productCode string) bool {
-	return false
+type AddFinalOrderRes struct {
+	entity.BaseResultEntity
+	CardNo  string
+	OrderNo string
 }
 
 //下正式订单
-func addFinalOrder(userName string, mobile string, productCode string, accountNo string, mappingOrderNo string) entity.BaseResultEntity {
-	result := entity.GetBaseFailRes()
+func addFinalOrder(userName string, mobile string, productCode string, accountNo string, mappingOrderNo string) AddFinalOrderRes {
+	result := AddFinalOrderRes{}
 	soaAddOrderRes, serverRes := proxy.AddSoaOrder(mappingOrderNo, accountNo)
 	if serverRes.IsSucess && soaAddOrderRes.ErrorCode == "200" {
 		result.IsSucess = true
 		orderNo := soaAddOrderRes.OrderNo
-		sendOrderSucessMessage(orderNo, mobile) //发送成功下单短信
+		cardNo, productName := getCardNo(orderNo)
+		result.CardNo = cardNo
+		result.OrderNo = soaAddOrderRes.OrderNo
+		sendOrderSucessMessage(cardNo, productName, mobile) //发送成功下单短信
 		result.Message = "响应成功"
 	} else {
 		result.IsSucess = false
@@ -147,21 +170,24 @@ func getMappingOrderNo() string {
 	return "P" + timestamp
 }
 
-func sendOrderSucessMessage(orderNo string, mobileNo string) bool {
+func sendOrderSucessMessage(cardNo, productName, mobileNo string) bool {
+	smsContent := fmt.Sprintf(config.ConfigInfo.SmsOfOrderSucess, productName, cardNo)
+	proxy.SendMsg(mobileNo, smsContent)
+	return true
+}
+
+func getCardNo(orderNo string) (cardNo, productName string) {
 	//获取院余号
 	soaGetOrderDetailResOut, serverRes := proxy.GetSoaOrderDetail(orderNo)
 	if !serverRes.IsSucess {
-		return false;
+		return
 	}
 	if soaGetOrderDetailResOut.ErrorCode == "200" && len(soaGetOrderDetailResOut.OrderList) > 0 {
 		orderDetail := soaGetOrderDetailResOut.OrderList[0]
 		if len(orderDetail.DetailList) > 0 {
-			yuanYuNo := orderDetail.DetailList[0].CardNo
-			productName := orderDetail.DetailList[0].ProdName
-			smsContent := fmt.Sprintf(config.ConfigInfo.SmsOfOrderSucess, productName, yuanYuNo)
-			proxy.SendMsg(mobileNo, smsContent)
-			return true
+			cardNo = orderDetail.DetailList[0].CardNo
+			productName = orderDetail.DetailList[0].ProdName
 		}
 	}
-	return false
+	return
 }

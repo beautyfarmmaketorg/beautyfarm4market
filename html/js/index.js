@@ -82,7 +82,9 @@ $(function () {
                     alertinfo.addClass("show");
                 }
                 else if (res.code == "3") {
-                    alert("临时单下单成功跳转支付");
+                    //alert("临时单下单成功跳转支付");
+                    //alert(res.PayUrl);
+                    window.location.href = res.PayUrl;
                 }
                 //var sucessAlert = $("#alert-success");
                 //sucessAlert.addClass("show");

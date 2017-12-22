@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>支付结果</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+{{ $payStatus:=$.checkPurchaseResponse.PayStatus }}
+{{ $payComplete :=2 }}
+
+{{if eq $payComplete $payStatus }}
+<!-- Dialog for purchase succeed -->
+<div id="alert-success" class="alert alert-success mask show">
+    <div class="alert-content">
+        <span class="icon-ok">✔</span>
+        <p class="txt">恭喜您购买成功</p>
+        <p class="desc">购买信息稍后会以短信的方式发送至您的手机</p>
+        <a href="" class="btn btn-primary btn-ok" id="sucessBtn">OK</a>
+    </div>
+</div>
+{{end}}
+
+
+{{if ne $payComplete $payStatus }}
+<div id="alert-success" class="alert alert-success mask">
+    <div class="alert-content">
+        <span class="icon-ok">✔</span>
+        <p class="txt">恭喜您购买成功</p>
+        <p class="desc">购买信息稍后会以短信的方式发送至您的手机</p>
+        <a href="" class="btn btn-primary btn-ok" id="sucessBtn">OK</a>
+    </div>
+</div>
+
+<!-- Dialog for purchase succeed -->
+<div id="alert-payIng" class="alert alert-success mask show">
+    <div class="alert-content">
+        <p class="txt">支付状态获取中...请勿关闭页面</p>
+        <p class="desc" id="processMsg"></p>
+    </div>
+</div>
+
+{{end}}
+
+<input id="payStatus" type="text" value="{{ $.checkPurchaseResponse.PayStatus }}"/>
+<input id="mappingOrderNo" type="text" value="{{ $.checkPurchaseResponse.MappingOrderNo }}"/>
+<input id="indexUrl" type="text" value="{{ $.checkPurchaseResponse.IndexUrl }}"/>
+<!-- /Dialog for purchase succeed -->
+<script src="assets/js/zepto.min.js" language="javascript"></script>
+<script src="assets/js/zeptocookie.js" language="javascript"></script>
+<script src="assets/js/purchanseRes.js" language="javascript"></script>
+</body>
+</html>
