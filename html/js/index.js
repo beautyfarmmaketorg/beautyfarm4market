@@ -102,8 +102,8 @@ $(function () {
                 }
                 else if (res.code == "3") {
                     //alert("临时单下单成功跳转支付");
-                    //alert(res.PayUrl);
-                    window.location.href = res.PayUrl;
+                    //微信环境外拉起支付 微信环境则进行认证获取openid
+                    window.location.href = res.redirect;
                 }
                 //var sucessAlert = $("#alert-success");
                 //sucessAlert.addClass("show");

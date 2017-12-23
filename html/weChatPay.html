@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <title>支付页面</title>
+</head>
+<body>
+<input id="appId" type="text" value="{{ $.weChatLoginAddOrderParams.AppId }}"/>
+<input id="timeStamp" type="text" value="{{ $.weChatLoginAddOrderParams.TimeStamp }}"/>
+<input id="nonceStr" type="text" value="{{ $.weChatLoginAddOrderParams.NonceStr }}"/>
+<input id="package" type="text" value="{{ $.weChatLoginAddOrderParams.Package }}"/>
+<input id="signType" type="text" value="{{ $.weChatLoginAddOrderParams.SignType }}"/>
+<input id="paySign" type="text" value="{{ $.weChatLoginAddOrderParams.PaySign }}"/>
+</body>
+<script src="assets/js/zepto.min.js" language="javascript"></script>
+<script src="assets/js/zeptocookie.js" language="javascript"></script>
+<script src="assets/js/weChatPay.js" language="javascript"></script>
+</html>

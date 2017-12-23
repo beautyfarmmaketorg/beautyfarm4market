@@ -45,9 +45,9 @@
 
 {{end}}
 
-<input id="payStatus" type="text" value="{{ $.checkPurchaseResponse.PayStatus }}"/>
-<input id="mappingOrderNo" type="text" value="{{ $.checkPurchaseResponse.MappingOrderNo }}"/>
-<input id="indexUrl" type="text" value="{{ $.checkPurchaseResponse.IndexUrl }}"/>
+<input id="payStatus" type="hidden" value="{{ $.checkPurchaseResponse.PayStatus }}"/>
+<input id="mappingOrderNo" type="hidden" value="{{ $.checkPurchaseResponse.MappingOrderNo }}"/>
+<input id="indexUrl" type="hidden" value="{{ $.checkPurchaseResponse.IndexUrl }}"/>
 <!-- /Dialog for purchase succeed -->
 <script src="assets/js/zepto.min.js" language="javascript"></script>
 <script src="assets/js/zeptocookie.js" language="javascript"></script>

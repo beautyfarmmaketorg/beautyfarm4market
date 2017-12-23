@@ -11,6 +11,7 @@ import (
 	"beautyfarm4market/dal"
 	"time"
 	"strings"
+	"net/url"
 )
 
 func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
@@ -68,25 +69,30 @@ func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
 	//闪客且没有下过订单
 	accountNo, _ := getAccountNo(mobileNo, username)
 	mappingOrderNo, _ := addTempOrder(username, mobileNo, config.ConfigInfo.ProductCode,
-		config.ConfigInfo.ProductName, accountNo, 1) //正式订单
+		config.ConfigInfo.ProductName, accountNo, 1, clientIp) //正式订单
+	userAgent := r.Header.Get("User-Agent")
+	dal.AddLog(dal.LogInfo{Title: "User-Agent", Description: userAgent, Type: 1})
 	if mappingOrderNo != "" {
-		userAgent := r.Header.Get("User-Agent")
 		if userAgent != "MicroMessenger" {
 			result.Code = "3" //成功下单跳转支付
 			weChatUnifiedorderResponse := InvokeWeChatUnifiedorder(productCode, "product", mappingOrderNo,
-				clientIp, totalPrice, r.Host)
+				clientIp, totalPrice, r.Host, "MWEB", "")
 			if weChatUnifiedorderResponse.ReturnCode == "SUCCESS" && weChatUnifiedorderResponse.MwebUrl != "" {
 				dal.UpdateTempOrderPayStatus(mappingOrderNo, 1) //更新支付状态
 				host := r.Host
 				if ! strings.Contains(host, "http") {
 					host = "http://" + host
 				}
-				redirect_url := host + "/purchaseRes?mappingOrderNo=" + mappingOrderNo
-				result.PayUrl = weChatUnifiedorderResponse.MwebUrl + "&redirect_url=" + redirect_url
+				redirect_url := url.QueryEscape(host + "/purchaseRes?mappingOrderNo=" + mappingOrderNo)
+				result.Redirect = weChatUnifiedorderResponse.MwebUrl + "&redirect_url=" + redirect_url
 				setMobileCodeCookie(w, mobileNo, "", -1)
 			}
 		} else {
 			//微信环境 获取openid
+			result.Code = "3" //成功下单跳转支付
+			redirectURI := url.QueryEscape(r.Host + "/handlerWeChatLogin")
+			weChatLoginUrl := fmt.Sprintf(config.ConfigInfo.WeChatLoginUrl, config.ConfigInfo.WeChatKey, redirectURI)
+			result.Redirect = weChatLoginUrl
 		}
 	}
 	json.NewEncoder(w).Encode(result)
@@ -95,11 +101,11 @@ func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
 
 type AddOrderResponse struct {
 	entity.BaseResultEntity
-	PayUrl string
+	Redirect string `json:"redirect"` //微信外环境 表示拉起微信支付 微信内表示身份认证
 }
 
 //添加临时单
-func addTempOrder(userName string, mobile string, productCode string, productName string, accountNo string, channel int) (mappingOrderNo string, res entity.BaseResultEntity) {
+func addTempOrder(userName string, mobile string, productCode string, productName string, accountNo string, channel int, clientIp string) (mappingOrderNo string, res entity.BaseResultEntity) {
 	res = entity.GetBaseSucessRes()
 	mappingOrderNo = getMappingOrderNo()
 	t := dal.TempOrder{
@@ -114,6 +120,7 @@ func addTempOrder(userName string, mobile string, productCode string, productNam
 		TotalPrice:     1,
 		ProductName:    config.ConfigInfo.ProductName,
 		OrderStatus:    1,
+		ClientIp:       clientIp,
 	}
 	isSucess := dal.AddTempOrder(t)
 	res.IsSucess = isSucess

@@ -49,6 +49,7 @@ type TempOrder struct {
 	ModifyDate     string
 	WechatorderNo  string
 	PayTime        string
+	ClientIp string
 }
 
 //mappingOrder_no, product_code, mobile_no, user_name, account_no,
@@ -56,11 +57,11 @@ type TempOrder struct {
 func AddTempOrder(t TempOrder) bool {
 	//插入数据
 	stmt, err := dbconnection.Prepare("INSERT temp_order SET mappingOrder_no=?,product_code=?,mobile_no=?," +
-		"user_name=?,account_no=?,total_price=?,order_status=?,pay_status=?,channel=?,create_date=?,modify_date=?,product_name=?")
+		"user_name=?,account_no=?,total_price=?,order_status=?,pay_status=?,channel=?,create_date=?,modify_date=?,product_name=?,client_ip=?")
 	checkErr(err)
 
 	res, err := stmt.Exec(t.MappingOrderNo, t.ProductCode, t.MobileNo, t.UserName, t.AccountNo,
-		t.TotalPrice, t.OrderStatus, t.PayStatus, t.Channel, t.CreateDate, t.ModifyDate, t.ProductName)
+		t.TotalPrice, t.OrderStatus, t.PayStatus, t.Channel, t.CreateDate, t.ModifyDate, t.ProductName,t.ClientIp)
 	checkErr(err)
 	rows, _ := res.RowsAffected()
 	return rows > 0
@@ -137,9 +138,10 @@ func toTempOrder(rows *sql.Rows) []TempOrder {
 		var channel int
 		var create_date string
 		var modify_date string
+		var client_ip string
 		errScan := rows.Scan(&mappingOrder_no, &product_code, &product_name, &mobile_no, &user_name,
 			&account_no, &total_price, &order_status,
-			&pay_status, &order_no, &card_no, &wechatorder_no, &pay_time, &channel, &create_date, &modify_date)
+			&pay_status, &order_no, &card_no, &wechatorder_no, &pay_time, &channel, &create_date, &modify_date,&client_ip)
 		checkErr(errScan)
 		t := TempOrder{
 			MappingOrderNo: mappingOrder_no,
@@ -158,6 +160,7 @@ func toTempOrder(rows *sql.Rows) []TempOrder {
 			OrderStatus:order_status,
 			WechatorderNo:wechatorder_no,
 			PayTime:pay_time,
+			ClientIp:client_ip,
 		}
 		tempOrders = append(tempOrders, t)
 	}

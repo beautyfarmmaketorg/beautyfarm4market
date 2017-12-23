@@ -59,9 +59,9 @@ func processTempOrder(mappingOrderNo string, wechatOrderNo string, timeEnd strin
 
 //调用微信统一下单接口
 func InvokeWeChatUnifiedorder(productCode string, productName string,
-	orderCode string, spbill_create_ip string, totalPrice int, host string) WeChatUnifiedorderResponse {
+	orderCode string, spbill_create_ip string, totalPrice int, host string,tradeType string,openId string) WeChatUnifiedorderResponse {
 	payResponse := WeChatUnifiedorderResponse{}
-	e := getwechatPayEntity(productCode, productName, orderCode, spbill_create_ip, totalPrice, host)
+	e := getwechatPayEntity(productCode, productName, orderCode, spbill_create_ip, totalPrice, host,tradeType,openId)
 	sign := getSign(e)
 	e.Sign = sign
 	xmlStr, _ := xml.Marshal(e);
@@ -115,7 +115,7 @@ func check(e error) {
 }
 
 func getwechatPayEntity(productCode string, productName string,
-	orderCode string, spbill_create_ip string, totalPrice int, host string) wechatPayEntity {
+	orderCode string, spbill_create_ip string, totalPrice int, host string,tradeType string,openId string) wechatPayEntity {
 	t := time.Now()
 	nonce_str := strconv.FormatInt(t.UTC().UnixNano(), 10)
 	notify_url := host + "/payCallBack" //异步回调
@@ -126,11 +126,11 @@ func getwechatPayEntity(productCode string, productName string,
 		Mch_id:           "1301086301",
 		Nonce_str:        nonce_str,
 		Notify_url:       notify_url,
-		Openid:           "",
+		Openid:           openId,
 		Out_trade_no:     orderCode,
 		Spbill_create_ip: spbill_create_ip,
 		Total_fee:        totalPrice,
-		Trade_type:       "MWEB",
+		Trade_type:       tradeType,
 	}
 	return entity
 }

@@ -29,6 +29,10 @@ type configEntity struct {
 	ProductName         string
 	UnifiedorderUrl     string //微信统一下单接口
 	WeChatKey           string
+	WeChatLoginUrl      string //获取微信authCode
+	WeChatAppId string //微信公众号appid
+	WeChatAuthUrl string //获取openid
+	WeChatSecret string //微信秘钥
 }
 
 func init() {
@@ -59,6 +63,10 @@ func init() {
 		ProductName:         "纯新胶原精华护理",
 		UnifiedorderUrl:     "https://api.mch.weixin.qq.com/pay/unifiedorder",
 		WeChatKey:           "meilitianyuan2016isgood2016igood",
-	}
+		WeChatLoginUrl:"https://open.weixin.qq.com/connect/qrconnect?appid=?&redirect_uri=?&response_type=code&scope=snsapi_login",
+		WeChatAppId:"wx7302aaa9857c055b",
+		WeChatAuthUrl:"https://api.weixin.qq.com/sns/oauth2/access_token?appid=?&secret=?&code=?&grant_type=authorization_code",
+		WeChatSecret:"077cb94b72154e7b3d7db95ba40a83cb",
+		}
 	fmt.Printf("init Config")
 }

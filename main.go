@@ -21,6 +21,7 @@ func main() {
 	mux.HandleFunc("/payCallBack", handler.SafeHandler(handler.PayCallBackHandler))
 	mux.HandleFunc("/purchaseRes", handler.SafeHandler(handler.PurchaseResHandler))
 	mux.HandleFunc("/checkPurchaseRes", handler.SafeHandler(handler.PurchaseResHandler))
+	mux.HandleFunc("/handlerWeChatLogin", handler.SafeHandler(handler.HandlerWeChatLoginHandler))
 	err := http.ListenAndServe(":8009", mux)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err.Error())
