@@ -19,7 +19,22 @@ func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
 	result.IsSucess = true
 	username := r.FormValue("username")
 	mobileNo := r.FormValue("mobileNo")
-	//code := r.FormValue("code")
+	code := r.FormValue("code")
+	messagecCodeCookieName := fmt.Sprintf(config.ConfigInfo.CodeCookie, mobileNo)
+	cookieCode, err := r.Cookie(messagecCodeCookieName)
+	if err == nil {
+		if code != cookieCode.Value {
+			result.Code = "-1"
+			result.Message = "请输入正确的验证码"
+			json.NewEncoder(w).Encode(result)
+			return
+		}
+	} else {
+		result.Code = "-2"
+		result.Message = "请获取验证码"
+		json.NewEncoder(w).Encode(result)
+		return
+	}
 	productCode := config.ConfigInfo.ProductCode // r.FormValue("productCode")
 	totalPrice := 1                              //1分钱
 	clientIp := r.Header.Get("Remote_addr")
@@ -55,17 +70,23 @@ func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
 	mappingOrderNo, _ := addTempOrder(username, mobileNo, config.ConfigInfo.ProductCode,
 		config.ConfigInfo.ProductName, accountNo, 1) //正式订单
 	if mappingOrderNo != "" {
-		result.Code = "3" //成功下单跳转支付
-		weChatUnifiedorderResponse := InvokeWeChatUnifiedorder(productCode, "product", mappingOrderNo,
-			clientIp, totalPrice, r.Host)
-		if weChatUnifiedorderResponse.ReturnCode == "SUCCESS" && weChatUnifiedorderResponse.MwebUrl != "" {
-			dal.UpdateTempOrderPayStatus(mappingOrderNo, 1) //更新支付状态
-			host := r.Host
-			if ! strings.Contains(host, "http") {
-				host = "http://" + host
+		userAgent := r.Header.Get("User-Agent")
+		if userAgent != "MicroMessenger" {
+			result.Code = "3" //成功下单跳转支付
+			weChatUnifiedorderResponse := InvokeWeChatUnifiedorder(productCode, "product", mappingOrderNo,
+				clientIp, totalPrice, r.Host)
+			if weChatUnifiedorderResponse.ReturnCode == "SUCCESS" && weChatUnifiedorderResponse.MwebUrl != "" {
+				dal.UpdateTempOrderPayStatus(mappingOrderNo, 1) //更新支付状态
+				host := r.Host
+				if ! strings.Contains(host, "http") {
+					host = "http://" + host
+				}
+				redirect_url := host + "/purchaseRes?mappingOrderNo=" + mappingOrderNo
+				result.PayUrl = weChatUnifiedorderResponse.MwebUrl + "&redirect_url=" + redirect_url
+				setMobileCodeCookie(w, mobileNo, "", -1)
 			}
-			redirect_url := host + "/purchaseRes?mappingOrderNo=" + mappingOrderNo
-			result.PayUrl = weChatUnifiedorderResponse.MwebUrl + "&redirect_url=" +redirect_url
+		} else {
+			//微信环境 获取openid
 		}
 	}
 	json.NewEncoder(w).Encode(result)

@@ -15,12 +15,13 @@ const (
 	dbname     = "db_beautyfarm_market" //db
 )
 
-func getConnection() *sql.DB {
-	//root:123456@tcp(127.0.0.1:3306)/Test?charset=utf8
+var dbconnection *sql.DB
+
+func init() {
+	var err error
 	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8", dbusername, dbpassword, dbhostsip, port, dbname)
-	db, err := sql.Open("mysql", dataSourceName)
+	dbconnection, err =  sql.Open("mysql", dataSourceName)
 	checkErr(err)
-	return db
 }
 
 func checkErr(err error) {
@@ -54,7 +55,6 @@ type TempOrder struct {
 // total_price, order_status, pay_status, order_no, card_no, channel, create_date, modify_date
 func AddTempOrder(t TempOrder) bool {
 	//插入数据
-	var dbconnection = getConnection()
 	stmt, err := dbconnection.Prepare("INSERT temp_order SET mappingOrder_no=?,product_code=?,mobile_no=?," +
 		"user_name=?,account_no=?,total_price=?,order_status=?,pay_status=?,channel=?,create_date=?,modify_date=?,product_name=?")
 	checkErr(err)
@@ -63,65 +63,54 @@ func AddTempOrder(t TempOrder) bool {
 		t.TotalPrice, t.OrderStatus, t.PayStatus, t.Channel, t.CreateDate, t.ModifyDate, t.ProductName)
 	checkErr(err)
 	rows, _ := res.RowsAffected()
-	defer dbconnection.Close()
 	return rows > 0
 }
 
 func UpdateTempOrder(cardNo string, orderNo string, mappingOrderNo string, wechatOrderNo string, timeEnd string) bool {
 	//插入数据
-	var dbconnection = getConnection()
 	stmt, err := dbconnection.Prepare("UPDATE temp_order SET card_no=?,order_no=?,wechatorder_no=?,pay_time=?,modify_date=NOW(),order_status=2,pay_status=2 where mappingOrder_no=?")
 	checkErr(err)
 	res, err := stmt.Exec(cardNo, orderNo, wechatOrderNo, timeEnd, mappingOrderNo)
 	checkErr(err)
 	rows, _ := res.RowsAffected()
-	defer dbconnection.Close()
 	return rows > 0
 }
 
 //更新支付中状态
 func UpdateTempOrderPayStatus(mappingOrderNo string, payStatus int) bool {
 	//插入数据
-	var dbconnection = getConnection()
 	stmt, err := dbconnection.Prepare("UPDATE temp_order SET modify_date=NOW(),pay_status=? where mappingOrder_no=?")
 	checkErr(err)
 	res, err := stmt.Exec(payStatus, mappingOrderNo)
 	checkErr(err)
 	rows, _ := res.RowsAffected()
-	defer dbconnection.Close()
 	return rows > 0
 }
 
 func GetAllOrders() []TempOrder {
-	var dbconnection = getConnection()
 	//查询数据
 	rows, err := dbconnection.Query("SELECT * FROM temp_order")
 	checkErr(err)
 	var tempOrders []TempOrder = toTempOrder(rows)
-	defer dbconnection.Close()
 	return tempOrders
 }
 
 func GetOrdersByMobile(mobile string, productCode string) []TempOrder {
-	var dbconnection = getConnection()
 	//查询数据
 	stmt, err := dbconnection.Prepare("select *  FROM db_beautyfarm_market.temp_order where mobile_no=? and product_code=?")
 	checkErr(err)
 	rows, err := stmt.Query(mobile, productCode)
 	var tempOrders []TempOrder = toTempOrder(rows)
-	defer dbconnection.Close()
 	return tempOrders
 }
 
 func GetOrdersByMappingOrderNo(mappingOrderNo string) TempOrder {
 	var tempOrder TempOrder = TempOrder{MappingOrderNo: "",}
-	var dbconnection = getConnection()
 	//查询数据
 	stmt, err := dbconnection.Prepare("select *  FROM db_beautyfarm_market.temp_order where mappingOrder_no=? ")
 	checkErr(err)
 	rows, err := stmt.Query(mappingOrderNo)
 	var tempOrders []TempOrder = toTempOrder(rows)
-	defer dbconnection.Close()
 	if len(tempOrders) > 0 {
 		tempOrder = tempOrders[0]
 	}
@@ -187,14 +176,12 @@ type LogInfo struct {
 }
 
 func AddLog(log LogInfo) bool {
-	var dbconnection = getConnection()
 	//插入数据
 	stmt, err := dbconnection.Prepare("INSERT log SET title=?,description=?,logType=?")
 	checkErr(err)
 	res, err := stmt.Exec(log.Title, log.Description, log.Type)
 	checkErr(err)
 	rows, _ := res.RowsAffected()
-	defer dbconnection.Close()
 	return rows > 0
 }
 

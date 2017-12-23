@@ -13,28 +13,43 @@ import (
 
 func MessageHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
+		w.Header().Set("Content-Type", "application/json;charset=utf-8")
+		sendMsgResult := entity.SendMsgResult{}
 		mobileNo := r.FormValue("mobileNo")
 		isSucess := false
 		message := ""
+		productCode := config.ConfigInfo.ProductCode
+		//检查是否已经下过订单
+		if hasOrdered := checkHasOrdered(mobileNo, productCode); hasOrdered {
+			sendMsgResult.Code = "1" //
+			json.NewEncoder(w).Encode(sendMsgResult)
+			return
+		}
+
+		//vip用户
+		if isVip := isVip(mobileNo); isVip {
+			sendMsgResult.Code = "2" //
+			json.NewEncoder(w).Encode(sendMsgResult)
+			return
+		}
 
 		if enable, _ := checkCookieTime(mobileNo, w, r); !enable {
 			isSucess = false
-			message =""// fmt.Sprintf("请稍后，剩余时间:%d 秒", leftSeconds)
+			message = "" // fmt.Sprintf("请稍后，剩余时间:%d 秒", leftSeconds)
 		} else {
-			if proxy.SendMsg(mobileNo, fmt.Sprintf(config.ConfigInfo.SmsOfVaild, getCode())) {
+			code := getCode()
+			if proxy.SendMsg(mobileNo, fmt.Sprintf(config.ConfigInfo.SmsOfVaild, code)) {
 				isSucess = true
 				message = "短信发送成功，请查看手机获取"
 				setMobileCookie(w, mobileNo, 8600)
+				setMobileCodeCookie(w, mobileNo, code, 8600)
 			} else {
 				message = "短信发送失败，请稍后重试"
 			}
 		}
-		sendMsgResult := entity.SendMsgResult{}
 		sendMsgResult.IsSucess = isSucess
 		sendMsgResult.Message = message
 		sendMsgResult.Mobile = mobileNo
-
-		w.Header().Set("Content-Type", "application/json;charset=utf-8")
 		json.NewEncoder(w).Encode(sendMsgResult)
 		return
 	}
@@ -69,6 +84,12 @@ func setMobileCookie(w http.ResponseWriter, mobileNo string, maxAge int) {
 	dataTimeStr := time.Unix(time.Now().Unix(), 0).Format(config.ConfigInfo.TimeLayout)
 	cookie := http.Cookie{Name: fmt.Sprintf(config.ConfigInfo.MobileCookie, mobileNo),
 		Value: dataTimeStr, Path: "/", Expires: time.Now().Add(time.Second * 30), MaxAge: maxAge}
+	http.SetCookie(w, &cookie)
+}
+
+func setMobileCodeCookie(w http.ResponseWriter, mobileNo string, code string, maxAge int) {
+	cookie := http.Cookie{Name: fmt.Sprintf(config.ConfigInfo.CodeCookie, mobileNo),
+		Value: code, Path: "/", Expires: time.Now().Add(time.Second * 30), MaxAge: maxAge}
 	http.SetCookie(w, &cookie)
 }
 

@@ -17,6 +17,7 @@ type configEntity struct {
 	GetAccountInfoUrl   string
 	SmsOfVaild          string
 	MobileCookie        string
+	CodeCookie          string
 	TimeLayout          string
 	RegisterChannelType string
 	PosService          string
@@ -26,8 +27,8 @@ type configEntity struct {
 	SignTemplate        string
 	ProductCode         string
 	ProductName         string
-	UnifiedorderUrl        string //微信统一下单接口
-	WeChatKey string
+	UnifiedorderUrl     string //微信统一下单接口
+	WeChatKey           string
 }
 
 func init() {
@@ -46,6 +47,7 @@ func init() {
 		SmsOfOrderSucess:    "您已成功购买产品%s，您的院余号为%s",
 		SmsOfVaild:          "%s（美丽田园手机验证码，请完成验证）， 如非本人操作，请忽略本短信。",
 		MobileCookie:        "code%s",
+		CodeCookie:          "messagecode%s",
 		TimeLayout:          "2006-01-02 15:04:05",
 		RegisterChannelType: "3003",
 		PosService:          "http://pos.beautyfarm.com.cn:8070/%s",
@@ -55,8 +57,8 @@ func init() {
 		AppSecret:           "Vit+HmAG8a+7JCyIEPmR5A==",
 		ProductCode:         "1110300002",
 		ProductName:         "纯新胶原精华护理",
-		UnifiedorderUrl:        "https://api.mch.weixin.qq.com/pay/unifiedorder",
-		WeChatKey:"meilitianyuan2016isgood2016igood",
+		UnifiedorderUrl:     "https://api.mch.weixin.qq.com/pay/unifiedorder",
+		WeChatKey:           "meilitianyuan2016isgood2016igood",
 	}
 	fmt.Printf("init Config")
 }

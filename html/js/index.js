@@ -26,7 +26,21 @@ $(function () {
                 showSucessMsg(res.message);
                 setInterval(handlerLeftSecond, 1000);
             } else {
-                showErrMsg(res.message);
+                if (res.message != undefined && res.message != "") {
+                    showErrMsg(res.message);
+                } else if (res.code != undefined && res.code != "") {
+                    var alertpurchase = $("#alert-purchase");
+                    if (res.code == "1") {
+                        alertpurchase.removeClass("show")
+                        var alertinfo2 = $("#alert-info2");//已经购买
+                        alertinfo2.addClass("show");
+                    }
+                    else if (res.code == "2") {
+                        alertpurchase.removeClass("show")
+                        var alertinfo = $("#alert-info");//vip
+                        alertinfo.addClass("show");
+                    }
+                }
             }
         });
     });
@@ -71,6 +85,11 @@ $(function () {
         var alertpurchase = $("#alert-purchase")
         $.post("/addOrder", {"username": username, "mobileNo": mobileNo, "code": code}, function (res) {
             if (res.isSucess) {
+                var intCode = parseInt(res.code);
+                if (intCode < 0) {
+                    showErrMsg(res.message);
+                    return;
+                }
                 if (res.code == "1") {
                     alertpurchase.removeClass("show")
                     var alertinfo2 = $("#alert-info2");//已经购买
