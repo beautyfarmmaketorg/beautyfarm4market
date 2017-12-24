@@ -1,5 +1,4 @@
 $(function () {
-
     function handlerLeftSecond() {
         var mobileNo = $("#phone").val();
         var leftSecond = getLeftSecond(mobileNo);

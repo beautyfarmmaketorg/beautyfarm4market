@@ -16,11 +16,11 @@ import (
 //记录openId 到cookie
 func HandlerWeChatLoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
+		dal.AddLog(dal.LogInfo{Title: "HandlerWeChatLoginHandler", Description: r.RequestURI, Type: 1})
 		code := r.FormValue("code")
 		mappingOrderNo := r.FormValue("mappingOrderNo")
 		mobileNo := r.FormValue("mobileNo")
 		if code != "" {
-			dal.AddLog(dal.LogInfo{Title: "WeChatLogin", Description: r.RequestURI, Type: 1})
 			if tokenRes, ok := proxy.GetAccessToken(code); ok.IsSucess {
 				openId := tokenRes.Openid
 				openIdCookie := http.Cookie{Name: "openId_" + mobileNo,
