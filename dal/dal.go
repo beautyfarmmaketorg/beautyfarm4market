@@ -5,6 +5,7 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"time"
+	"encoding/json"
 )
 
 const (
@@ -186,6 +187,11 @@ func AddLog(log LogInfo) bool {
 	checkErr(err)
 	rows, _ := res.RowsAffected()
 	return rows > 0
+}
+
+func AddJsonLog(title string,obj interface{}) bool {
+	jstr,_:=json.Marshal(obj)
+	return AddLog(LogInfo{Title:title,Description:string(jstr),Type:1})
 }
 
 /******************************************/

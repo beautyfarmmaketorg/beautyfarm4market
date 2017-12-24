@@ -3,7 +3,6 @@ package handler
 import (
 	"net/http"
 	"beautyfarm4market/dal"
-	"beautyfarm4market/proxy"
 	"time"
 	"beautyfarm4market/config"
 	"strconv"
@@ -17,44 +16,38 @@ import (
 func HandlerWeChatLoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		dal.AddLog(dal.LogInfo{Title: "HandlerWeChatLoginHandler", Description: r.RequestURI, Type: 1})
-		code := r.FormValue("code")
+		openId := r.FormValue("openid")
 		mappingOrderNo := r.FormValue("mappingOrderNo")
-		mobileNo := r.FormValue("mobileNo")
-		if code != "" {
-			if tokenRes, ok := proxy.GetAccessToken(code); ok.IsSucess {
-				openId := tokenRes.Openid
-				openIdCookie := http.Cookie{Name: "openId_" + mobileNo,
-					Value: openId, Path: "/", Expires: time.Now().Add(time.Hour * 24), MaxAge: 8600}
-				mappingOrderNoCookie := http.Cookie{Name: "mappingOrderNoCookie",
-					Value: mappingOrderNo, Path: "/", Expires: time.Now().Add(time.Hour * 1), MaxAge: 8600}
-				http.SetCookie(w, &openIdCookie)
-				http.SetCookie(w, &mappingOrderNoCookie) //记录订单号
-				tempOrderInfo := dal.GetOrdersByMappingOrderNo(mappingOrderNo);
-				weChatUnifiedorderResponse := InvokeWeChatUnifiedorder(tempOrderInfo.ProductCode, tempOrderInfo.ProductName,
-					mappingOrderNo,
-					tempOrderInfo.ClientIp, int(tempOrderInfo.TotalPrice), r.Host, "JSAPI", openId)
-				if weChatUnifiedorderResponse.ReturnCode == "SUCCESS" && weChatUnifiedorderResponse.MwebUrl != "" {
-					dal.UpdateTempOrderPayStatus(mappingOrderNo, 1) //更新支付状态
-					weChatLoginAddOrderParams:=getWeChatLoginAddOrderParams(weChatUnifiedorderResponse.PrepayId)
-					locals:=make(map[string]interface{})
-					locals["weChatLoginAddOrderParams"]=weChatLoginAddOrderParams
-					util.RenderHtml(w, "weChatPay.html", locals)
-					return
-				}
-			} else {
-				dal.AddLog(dal.LogInfo{Title: "GetAuthCodeFail", Description: "", Type: 1})
-			}
+		mappingOrderNoCookie := http.Cookie{Name: "mappingOrderNoCookie",
+			Value: mappingOrderNo, Path: "/", Expires: time.Now().Add(time.Hour * 1), MaxAge: 8600}
+		http.SetCookie(w, &mappingOrderNoCookie) //记录订单号
+		tempOrderInfo := dal.GetOrdersByMappingOrderNo(mappingOrderNo);
+		weChatUnifiedorderResponse := InvokeWeChatUnifiedorder(tempOrderInfo.ProductCode, tempOrderInfo.ProductName,
+			mappingOrderNo,
+			tempOrderInfo.ClientIp, int(tempOrderInfo.TotalPrice), r.Host, "JSAPI", openId)
+		if weChatUnifiedorderResponse.ReturnCode == "SUCCESS" && weChatUnifiedorderResponse.PrepayId != "" {
+			dal.UpdateTempOrderPayStatus(mappingOrderNo, 1) //更新支付状态
+			weChatLoginAddOrderParams := getWeChatLoginAddOrderParams(weChatUnifiedorderResponse.PrepayId,r.Host)
+			locals := make(map[string]interface{})
+			locals["weChatLoginAddOrderParams"] = weChatLoginAddOrderParams
+			dal.AddJsonLog("weChatPayLocals", weChatLoginAddOrderParams)
+			util.RenderHtml(w, "weChatPay.html", locals)
+			return
+		} else {
+			util.RenderHtml(w, "weChatPay.html", nil)
+			return
 		}
 	}
 }
 
-func getWeChatLoginAddOrderParams(prepayId string) WeChatLoginAddOrderParams {
+func getWeChatLoginAddOrderParams(prepayId string,host string) WeChatLoginAddOrderParams {
 	args := WeChatLoginAddOrderParams{
 		AppId:     config.ConfigInfo.WeChatAppId,
 		TimeStamp: strconv.FormatInt(time.Now().Unix(), 10),
 		NonceStr:  strconv.FormatInt(time.Now().Unix(), 10),
 		Package:   "prepay_id=" + prepayId,
 		SignType:  "MD5",
+		IndexUrl:host,
 	}
 	sign := getSign4WeChatPay(args)
 	args.PaySign = sign
@@ -93,4 +86,5 @@ type WeChatLoginAddOrderParams struct {
 	Package   string
 	SignType  string
 	PaySign   string
+	IndexUrl string
 }

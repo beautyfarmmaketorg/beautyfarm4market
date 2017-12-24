@@ -73,7 +73,7 @@ func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
 	userAgent := r.Header.Get("User-Agent")
 	dal.AddLog(dal.LogInfo{Title: "User-Agent", Description: userAgent, Type: 1})
 	if mappingOrderNo != "" {
-		if !strings.Contains(userAgent,"MicroMessenger")  {
+		if !strings.Contains(userAgent, "MicroMessenger") {
 			result.Code = "3" //成功下单跳转支付
 			weChatUnifiedorderResponse := InvokeWeChatUnifiedorder(productCode, "product", mappingOrderNo,
 				clientIp, totalPrice, r.Host, "MWEB", "")
@@ -90,9 +90,9 @@ func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			//微信环境 获取openid
 			result.Code = "3" //成功下单跳转支付
-			redirectURI := url.QueryEscape(r.Host + "/handlerWeChatLogin")
-			weChatLoginUrl := fmt.Sprintf(config.ConfigInfo.WeChatLoginUrl, config.ConfigInfo.WeChatAppId, redirectURI)
-			dal.AddLog(dal.LogInfo{Title:"weChatLoginUrl",Description:weChatLoginUrl,Type:1})
+			redirectURI := url.QueryEscape("http://" + r.Host + "/handlerWeChatLogin?mappingOrderNo=" + mappingOrderNo)
+			weChatLoginUrl := fmt.Sprintf(config.ConfigInfo.WeChatLoginUrl, redirectURI)
+			dal.AddLog(dal.LogInfo{Title: "weChatLoginUrl", Description: weChatLoginUrl, Type: 1})
 			result.Redirect = weChatLoginUrl
 		}
 	}

@@ -34,6 +34,7 @@ type configEntity struct {
 	WeChatAuthUrl       string //获取openid
 	WeChatSecret        string //微信秘钥
 	ProxyDir            string
+	Version             string
 }
 
 func init() {
@@ -64,11 +65,12 @@ func init() {
 		ProductName:         "纯新胶原精华护理",
 		UnifiedorderUrl:     "https://api.mch.weixin.qq.com/pay/unifiedorder",
 		WeChatKey:           "meilitianyuan2016isgood2016igood",
-		WeChatLoginUrl:      "https://open.weixin.qq.com/connect/qrconnect?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base,snsapi_login",
+		WeChatLoginUrl:      "http://bfwechat.beautyfarm.com.cn/Url.aspx?url=%s&scope=snsapi_base,snsapi_login",
 		WeChatAppId:         "wx7302aaa9857c055b",
 		WeChatAuthUrl:       "https://api.weixin.qq.com/sns/oauth2/access_token?appid=?&secret=?&code=?&grant_type=authorization_code",
 		WeChatSecret:        "077cb94b72154e7b3d7db95ba40a83cb",
 		ProxyDir:            "beautyfarm4market",
+		Version:             "v1",
 	}
 	fmt.Printf("init Config")
 }

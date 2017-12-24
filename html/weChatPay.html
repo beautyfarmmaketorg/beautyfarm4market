@@ -4,14 +4,26 @@
     <meta charset="UTF-8" name="viewport"
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <title>支付页面</title>
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-<input id="appId" type="text" value="{{ $.weChatLoginAddOrderParams.AppId }}"/>
-<input id="timeStamp" type="text" value="{{ $.weChatLoginAddOrderParams.TimeStamp }}"/>
-<input id="nonceStr" type="text" value="{{ $.weChatLoginAddOrderParams.NonceStr }}"/>
-<input id="package" type="text" value="{{ $.weChatLoginAddOrderParams.Package }}"/>
-<input id="signType" type="text" value="{{ $.weChatLoginAddOrderParams.SignType }}"/>
-<input id="paySign" type="text" value="{{ $.weChatLoginAddOrderParams.PaySign }}"/>
+
+<div id="alert-success" class="alert alert-success mask">
+    <div class="alert-content">
+        <span class="icon-ok">✔</span>
+        <p class="txt">恭喜您购买成功</p>
+        <p class="desc">购买信息稍后会以短信的方式发送至您的手机</p>
+        <a href="" class="btn btn-primary btn-ok" id="sucessBtn">OK</a>
+    </div>
+</div>
+
+<input id="appId" type="hidden" value="{{ $.weChatLoginAddOrderParams.AppId }}"/>
+<input id="timeStamp" type="hidden" value="{{ $.weChatLoginAddOrderParams.TimeStamp }}"/>
+<input id="nonceStr" type="hidden" value="{{ $.weChatLoginAddOrderParams.NonceStr }}"/>
+<input id="package" type="hidden" value="{{ $.weChatLoginAddOrderParams.Package }}"/>
+<input id="signType" type="hidden" value="{{ $.weChatLoginAddOrderParams.SignType }}"/>
+<input id="paySign" type="hidden" value="{{ $.weChatLoginAddOrderParams.PaySign }}"/>
+<input id="indexUrl" type="hidden" value="{{ $.weChatLoginAddOrderParams.IndexUrl }}"/>
 </body>
 <script src="assets/js/zepto.min.js" language="javascript"></script>
 <script src="assets/js/zeptocookie.js" language="javascript"></script>
