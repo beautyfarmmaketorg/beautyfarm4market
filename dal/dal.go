@@ -21,7 +21,7 @@ var dbconnection *sql.DB
 func init() {
 	var err error
 	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8", dbusername, dbpassword, dbhostsip, port, dbname)
-	dbconnection, err =  sql.Open("mysql", dataSourceName)
+	dbconnection, err = sql.Open("mysql", dataSourceName)
 	checkErr(err)
 }
 
@@ -50,7 +50,8 @@ type TempOrder struct {
 	ModifyDate     string
 	WechatorderNo  string
 	PayTime        string
-	ClientIp string
+	ClientIp       string
+	OrignalPrice float64
 }
 
 //mappingOrder_no, product_code, mobile_no, user_name, account_no,
@@ -58,11 +59,11 @@ type TempOrder struct {
 func AddTempOrder(t TempOrder) bool {
 	//插入数据
 	stmt, err := dbconnection.Prepare("INSERT temp_order SET mappingOrder_no=?,product_code=?,mobile_no=?," +
-		"user_name=?,account_no=?,total_price=?,order_status=?,pay_status=?,channel=?,create_date=?,modify_date=?,product_name=?,client_ip=?")
+		"user_name=?,account_no=?,total_price=?,order_status=?,pay_status=?,channel=?,create_date=?,modify_date=?,product_name=?,client_ip=?,orignal_price=?")
 	checkErr(err)
 
 	res, err := stmt.Exec(t.MappingOrderNo, t.ProductCode, t.MobileNo, t.UserName, t.AccountNo,
-		t.TotalPrice, t.OrderStatus, t.PayStatus, t.Channel, t.CreateDate, t.ModifyDate, t.ProductName,t.ClientIp)
+		t.TotalPrice, t.OrderStatus, t.PayStatus, t.Channel, t.CreateDate, t.ModifyDate, t.ProductName, t.ClientIp,t.OrignalPrice)
 	checkErr(err)
 	rows, _ := res.RowsAffected()
 	return rows > 0
@@ -99,7 +100,7 @@ func GetAllOrders() []TempOrder {
 
 func GetOrdersByMobile(mobile string, productCode string) []TempOrder {
 	//查询数据
-	stmt, err := dbconnection.Prepare("select *  FROM db_beautyfarm_market.temp_order where mobile_no=? and product_code=?")
+	stmt, err := dbconnection.Prepare("select *  FROM db_beautyfarm_market.temp_order where mobile_no=? and product_code=? and pay_status=2 ")
 	checkErr(err)
 	rows, err := stmt.Query(mobile, productCode)
 	var tempOrders []TempOrder = toTempOrder(rows)
@@ -140,9 +141,10 @@ func toTempOrder(rows *sql.Rows) []TempOrder {
 		var create_date string
 		var modify_date string
 		var client_ip string
+		var orignal_price float64
 		errScan := rows.Scan(&mappingOrder_no, &product_code, &product_name, &mobile_no, &user_name,
 			&account_no, &total_price, &order_status,
-			&pay_status, &order_no, &card_no, &wechatorder_no, &pay_time, &channel, &create_date, &modify_date,&client_ip)
+			&pay_status, &order_no, &card_no, &wechatorder_no, &pay_time, &channel, &create_date, &modify_date, &client_ip,&orignal_price)
 		checkErr(errScan)
 		t := TempOrder{
 			MappingOrderNo: mappingOrder_no,
@@ -158,10 +160,11 @@ func toTempOrder(rows *sql.Rows) []TempOrder {
 			OrderNo:        order_no,
 			CardNo:         card_no,
 			PayStatus:      pay_status,
-			OrderStatus:order_status,
-			WechatorderNo:wechatorder_no,
-			PayTime:pay_time,
-			ClientIp:client_ip,
+			OrderStatus:    order_status,
+			WechatorderNo:  wechatorder_no,
+			PayTime:        pay_time,
+			ClientIp:       client_ip,
+			OrignalPrice:orignal_price,
 		}
 		tempOrders = append(tempOrders, t)
 	}
@@ -189,9 +192,99 @@ func AddLog(log LogInfo) bool {
 	return rows > 0
 }
 
-func AddJsonLog(title string,obj interface{}) bool {
-	jstr,_:=json.Marshal(obj)
-	return AddLog(LogInfo{Title:title,Description:string(jstr),Type:1})
+func AddJsonLog(title string, obj interface{}) bool {
+	jstr, _ := json.Marshal(obj)
+	return AddLog(LogInfo{Title: title, Description: string(jstr), Type: 1})
 }
 
 /******************************************/
+
+/*prodcutinfo*/
+type ProductInfo struct {
+	Product_id         int64
+	Prodcut_name       string
+	Prodcut_desc       string
+	Prodcut_rule       string
+	Price              float64
+	Orignal_price      float64
+	Backgroud_image    string
+	Rule_image         string
+	PurhchaseBtn_image string
+	Isactive           int
+	Create_date        string
+	Product_code string
+}
+
+func AddProductInfo(p ProductInfo) bool {
+	//插入数据
+	stmt, err := dbconnection.Prepare("INSERT product SET prodcut_name=?,prodcut_desc=?,prodcut_rule=?,price=?,orignal_price=?,backgroud_image=?,rule_image=?,purhchaseBtn_image=?,product_code=?")
+	checkErr(err)
+	res, err := stmt.Exec(p.Prodcut_name, p.Prodcut_desc, p.Prodcut_rule, p.Price, p.Orignal_price, p.Backgroud_image, p.Rule_image, p.PurhchaseBtn_image,p.Product_code)
+	checkErr(err)
+	rows, _ := res.RowsAffected()
+	return rows > 0
+}
+
+func UpdateProductInfo(p ProductInfo) bool {
+	//插入数据
+	stmt, err := dbconnection.Prepare("update product SET prodcut_name=?,prodcut_desc=?" +
+		",prodcut_rule=?,price=?,orignal_price=?,backgroud_image=?,rule_image=?,purhchaseBtn_image=?,product_code=? where product_id=?")
+	checkErr(err)
+	res, err := stmt.Exec(p.Prodcut_name, p.Prodcut_desc, p.Prodcut_rule, p.Price, p.Orignal_price, p.Backgroud_image, p.Rule_image, p.PurhchaseBtn_image,p.Product_code, p.Product_id)
+	checkErr(err)
+	rows, _ := res.RowsAffected()
+	return rows > 0
+}
+
+func GetProductInfo(productId int64) ProductInfo {
+	p := ProductInfo{Product_id: int64(0),}
+	//查询数据
+	stmt, err := dbconnection.Prepare("select *  FROM db_beautyfarm_market.product where Product_id=? and isactive=1")
+	checkErr(err)
+	rows, err := stmt.Query(productId)
+	var products []ProductInfo = toProducts(rows)
+	if len(products) > 0 {
+		p = products[0]
+	}
+	return p
+}
+
+func toProducts(rows *sql.Rows) []ProductInfo {
+	var products []ProductInfo
+	for rows.Next() {
+		var product_id int64
+		var prodcut_name string
+		var prodcut_desc string
+		var prodcut_rule string
+		var price float64
+		var orignal_price float64
+		var backgroud_image string
+		var rule_image string
+		var purhchaseBtn_image string
+		var isactive int
+		var create_date string
+		var product_code string
+		errScan := rows.Scan(&product_id, &prodcut_name, &prodcut_desc, &prodcut_rule, &price,
+			&orignal_price, &backgroud_image, &rule_image,
+			&purhchaseBtn_image, &isactive, &create_date,&product_code)
+		checkErr(errScan)
+		p := ProductInfo{
+			Product_id:         product_id,
+			Prodcut_name:       prodcut_name,
+			Prodcut_desc:       prodcut_desc,
+			Prodcut_rule:       prodcut_rule,
+			Price:              price,
+			Orignal_price:      orignal_price,
+			Backgroud_image:    backgroud_image,
+			Rule_image:         rule_image,
+			PurhchaseBtn_image: purhchaseBtn_image,
+			Isactive:           isactive,
+			Create_date:        create_date,
+			Product_code:product_code,
+		}
+		products = append(products, p)
+	}
+	return products
+}
+
+/*prodcutinfo end*/

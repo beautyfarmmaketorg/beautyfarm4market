@@ -4,6 +4,8 @@ import (
 	"beautyfarm4market/entity"
 	"beautyfarm4market/config"
 	"fmt"
+	"beautyfarm4market/dal"
+	"strconv"
 )
 
 func AddSoaOrder(mappingOrderNo string, accountNo string) (soaAddOrderResOut SoaAddOrderRes, baseResultEntity entity.BaseResultEntity) {
@@ -17,10 +19,11 @@ func AddSoaOrder(mappingOrderNo string, accountNo string) (soaAddOrderResOut Soa
 
 //获取下单请求
 func getSoaAddOrderReq(mappingOrderNo string, accountNo string) SoaOrderDetai {
+	temporder := dal.GetOrdersByMappingOrderNo(mappingOrderNo)
 	soaAddOrderReq := SoaOrderDetai{
 		AppId:          config.ConfigInfo.OrderServiceAppId,
 		ModifyType:     "1",
-		MappingOrderNo: mappingOrderNo,
+		MappingOrderNo: temporder.MappingOrderNo,
 		AccountNo:      accountNo,
 		Channel:        config.ConfigInfo.Channel,
 		OrderType:      "2",
@@ -29,20 +32,20 @@ func getSoaAddOrderReq(mappingOrderNo string, accountNo string) SoaOrderDetai {
 			{
 				DetailListNo: "01",
 				ProdCategory: "32",
-				ProdNo:       config.ConfigInfo.ProductCode,
-				ProdName:     config.ConfigInfo.ProductName,
+				ProdNo:       temporder.ProductCode,
+				ProdName:     temporder.ProductName,
 				ProdUnit:     "件",
 				OrderQty:     "1",
-				ProdPrice:    "1",
-				ProdAmt:      "1",
-				OrderPrice:   "1",
-				OrderAmt:     "1",
+				ProdPrice:    strconv.FormatFloat(temporder.OrignalPrice, 'f', 2, 64),
+				ProdAmt:      strconv.FormatFloat(temporder.OrignalPrice, 'f', 2, 64),
+				OrderPrice:   strconv.FormatFloat(temporder.TotalPrice, 'f', 2, 64),
+				OrderAmt:     strconv.FormatFloat(temporder.TotalPrice, 'f', 2, 64),
 				PayList: []SoaPayInfoDetail{
 					{
 						PayNo:       mappingOrderNo,
 						PayCategory: "3",
 						PayType:     "第三方支付",
-						PayAmt:      "1",
+						PayAmt:      strconv.FormatFloat(temporder.TotalPrice, 'f', 2, 64),
 						PayTimes:    "1",
 					},
 				},

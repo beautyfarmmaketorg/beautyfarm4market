@@ -22,32 +22,37 @@ func HandlerWeChatLoginHandler(w http.ResponseWriter, r *http.Request) {
 			Value: mappingOrderNo, Path: "/", Expires: time.Now().Add(time.Hour * 1), MaxAge: 8600}
 		http.SetCookie(w, &mappingOrderNoCookie) //记录订单号
 		tempOrderInfo := dal.GetOrdersByMappingOrderNo(mappingOrderNo);
+		if tempOrderInfo.PayStatus == 2 {
+			//已支付则跳转首页
+			util.RenderHtml(w, "index.html", nil)
+			return
+		}
 		weChatUnifiedorderResponse := InvokeWeChatUnifiedorder(tempOrderInfo.ProductCode, tempOrderInfo.ProductName,
 			mappingOrderNo,
 			tempOrderInfo.ClientIp, int(tempOrderInfo.TotalPrice), r.Host, "JSAPI", openId)
 		if weChatUnifiedorderResponse.ReturnCode == "SUCCESS" && weChatUnifiedorderResponse.PrepayId != "" {
 			dal.UpdateTempOrderPayStatus(mappingOrderNo, 1) //更新支付状态
-			weChatLoginAddOrderParams := getWeChatLoginAddOrderParams(weChatUnifiedorderResponse.PrepayId,r.Host)
+			weChatLoginAddOrderParams := getWeChatLoginAddOrderParams(weChatUnifiedorderResponse.PrepayId, r.Host)
 			locals := make(map[string]interface{})
 			locals["weChatLoginAddOrderParams"] = weChatLoginAddOrderParams
 			dal.AddJsonLog("weChatPayLocals", weChatLoginAddOrderParams)
 			util.RenderHtml(w, "weChatPay.html", locals)
 			return
 		} else {
-			util.RenderHtml(w, "weChatPay.html", nil)
+			util.RenderHtml(w, "index.html", nil)
 			return
 		}
 	}
 }
 
-func getWeChatLoginAddOrderParams(prepayId string,host string) WeChatLoginAddOrderParams {
+func getWeChatLoginAddOrderParams(prepayId string, host string) WeChatLoginAddOrderParams {
 	args := WeChatLoginAddOrderParams{
 		AppId:     config.ConfigInfo.WeChatAppId,
 		TimeStamp: strconv.FormatInt(time.Now().Unix(), 10),
 		NonceStr:  strconv.FormatInt(time.Now().Unix(), 10),
 		Package:   "prepay_id=" + prepayId,
 		SignType:  "MD5",
-		IndexUrl:host,
+		IndexUrl:  host,
 	}
 	sign := getSign4WeChatPay(args)
 	args.PaySign = sign
@@ -86,5 +91,5 @@ type WeChatLoginAddOrderParams struct {
 	Package   string
 	SignType  string
 	PaySign   string
-	IndexUrl string
+	IndexUrl  string
 }

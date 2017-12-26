@@ -20,7 +20,8 @@ $(function () {
         if (leftSecond > 0) {
             setInterval(handlerLeftSecond, 1000);
         }
-        $.get("/sendMsg", {"mobileNo": mobileNo}, function (res) {
+        var productId = $("#productId").val();
+        $.get("/sendMsg", {"mobileNo": mobileNo,"productId":productId}, function (res) {
             if (res.isSucess) {
                 showSucessMsg(res.message);
                 setInterval(handlerLeftSecond, 1000);
@@ -81,8 +82,9 @@ $(function () {
         var username = $("#username").val();
         var mobileNo = $("#phone").val();
         var code = $("#code").val();
+        var productId = $("#productId").val();
         var alertpurchase = $("#alert-purchase")
-        $.post("/addOrder", {"username": username, "mobileNo": mobileNo, "code": code}, function (res) {
+        $.post("/addOrder", {"username": username, "mobileNo": mobileNo, "code": code,"productId":productId}, function (res) {
             if (res.isSucess) {
                 var intCode = parseInt(res.code);
                 if (intCode < 0) {

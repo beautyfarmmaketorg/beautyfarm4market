@@ -9,6 +9,7 @@ import (
 	"beautyfarm4market/config"
 	"time"
 	"strconv"
+	"beautyfarm4market/dal"
 )
 
 func MessageHandler(w http.ResponseWriter, r *http.Request) {
@@ -18,7 +19,14 @@ func MessageHandler(w http.ResponseWriter, r *http.Request) {
 		mobileNo := r.FormValue("mobileNo")
 		isSucess := false
 		message := ""
-		productCode := config.ConfigInfo.ProductCode
+
+		productIdStr:=r.FormValue("productId")
+		if productIdStr == "" {
+			productIdStr = "1"
+		}
+		productId, _ := strconv.ParseInt(productIdStr, 10, 64)
+		productInfo:=dal.GetProductInfo(productId)
+		productCode :=productInfo.Product_code
 		//检查是否已经下过订单
 		if hasOrdered := checkHasOrdered(mobileNo, productCode); hasOrdered {
 			sendMsgResult.Code = "1" //

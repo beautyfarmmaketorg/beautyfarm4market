@@ -35,7 +35,7 @@ $(function () {
         if (url.indexOf("http") == -1) {
             url = "http://" + url;
         }
-        window.open(url);
+        window.location.href = url + "?id=" + 10000 * Math.random();
     });
 
 })
