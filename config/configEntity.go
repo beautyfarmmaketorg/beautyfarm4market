@@ -56,7 +56,7 @@ func init() {
 		CodeCookie:          "messagecode%s",
 		TimeLayout:          "2006-01-02 15:04:05",
 		RegisterChannelType: "3003",
-		PosService:          "http://192.168.68.151:8080/%s",
+		PosService:          "http://192.168.68.151:8070/%s",
 		IsVipUrl:            "customer/isVipMember?org_no=beautyfarm&mobile=%s&appid=%s&timestamp=%d&sign=%s",
 		SignTemplate:        "appid=%s&secretkey=%s&timestamp=%d",
 		PosServiceAppId:     "bf_market",

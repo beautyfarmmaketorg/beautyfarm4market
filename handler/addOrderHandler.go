@@ -22,6 +22,7 @@ func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
 	mobileNo := r.FormValue("mobileNo")
 	code := r.FormValue("code")
 	productIdStr:=r.FormValue("productId")
+	channelcode:=r.FormValue("channelcode")
 	if productIdStr == "" {
 		productIdStr = "1"
 	}
@@ -74,7 +75,7 @@ func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
 
 	//闪客且没有下过订单
 	accountNo, _ := getAccountNo(mobileNo, username)
-	mappingOrderNo, _ := addTempOrder(username, mobileNo,productId, accountNo, 1, clientIp) //正式订单
+	mappingOrderNo, _ := addTempOrder(username, mobileNo,productId, accountNo, channelcode, clientIp) //正式订单
 	userAgent := r.Header.Get("User-Agent")
 	dal.AddLog(dal.LogInfo{Title: "User-Agent", Description: userAgent, Type: 1})
 	if mappingOrderNo != "" {
@@ -111,7 +112,7 @@ type AddOrderResponse struct {
 }
 
 //添加临时单
-func addTempOrder(userName string, mobile string, productId int64, accountNo string, channel int, clientIp string) (mappingOrderNo string, res entity.BaseResultEntity) {
+func addTempOrder(userName string, mobile string, productId int64, accountNo string, channel string, clientIp string) (mappingOrderNo string, res entity.BaseResultEntity) {
 	res = entity.GetBaseSucessRes()
 	mappingOrderNo = getMappingOrderNo()
 	p:=dal.GetProductInfo(productId)

@@ -45,7 +45,7 @@ type TempOrder struct {
 	PayStatus      int
 	OrderNo        string
 	CardNo         string
-	Channel        int
+	Channel        string
 	CreateDate     string
 	ModifyDate     string
 	WechatorderNo  string
@@ -137,7 +137,7 @@ func toTempOrder(rows *sql.Rows) []TempOrder {
 		var card_no string
 		var wechatorder_no string
 		var pay_time string
-		var channel int
+		var channel string
 		var create_date string
 		var modify_date string
 		var client_ip string
@@ -288,3 +288,24 @@ func toProducts(rows *sql.Rows) []ProductInfo {
 }
 
 /*prodcutinfo end*/
+
+/*view log*/
+type ViewLog struct {
+	Pageview_id int64
+	Pange_url string
+	Client_ip string
+	Channel_code string
+}
+
+
+func AddViewLog(v ViewLog) bool {
+	//插入数据
+	stmt, err := dbconnection.Prepare("INSERT page_view SET pange_url=?,client_ip=?,channel_code=?")
+	checkErr(err)
+	res, err := stmt.Exec(v.Pange_url,v.Client_ip,v.Channel_code)
+	checkErr(err)
+	rows, _ := res.RowsAffected()
+	return rows > 0
+}
+
+/*view log*/

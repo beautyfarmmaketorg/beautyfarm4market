@@ -83,8 +83,9 @@ $(function () {
         var mobileNo = $("#phone").val();
         var code = $("#code").val();
         var productId = $("#productId").val();
+        var channelcode = $("#channelcode").val();
         var alertpurchase = $("#alert-purchase")
-        $.post("/addOrder", {"username": username, "mobileNo": mobileNo, "code": code,"productId":productId}, function (res) {
+        $.post("/addOrder", {"username": username, "mobileNo": mobileNo, "code": code,"productId":productId,"channelcode":channelcode}, function (res) {
             if (res.isSucess) {
                 var intCode = parseInt(res.code);
                 if (intCode < 0) {

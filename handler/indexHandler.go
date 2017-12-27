@@ -15,6 +15,9 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 			productIdStr = "1"
 		}
 		productId, err := strconv.ParseInt(productIdStr, 10, 64)
+		clientIp := r.RemoteAddr
+		pageUrl := r.Host + "/index"
+		dal.AddViewLog(dal.ViewLog{Channel_code: channelcode, Pange_url: pageUrl, Client_ip: clientIp})
 		if err == nil {
 			p := dal.GetProductInfo(productId)
 			if p.Product_id == 0 {
