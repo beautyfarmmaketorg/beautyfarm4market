@@ -58,6 +58,8 @@ func processTempOrder(mappingOrderNo string, wechatOrderNo string, timeEnd strin
 		if addRes.IsSucess {
 			cardNo := addRes.CardNo
 			res = dal.UpdateTempOrder(cardNo, addRes.OrderNo, mappingOrderNo, wechatOrderNo, timeEnd)
+		}else {
+			dal.AddJsonLog("addFinalOrderFail" + mappingOrderNo,addRes)
 		}
 	}
 	return res
