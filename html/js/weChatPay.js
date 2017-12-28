@@ -12,8 +12,9 @@ $(function () {
             function (res) {
                 if (res.err_msg == "get_brand_wcpay_request:ok") {
                     $("#alert-success").addClass("show");
+                    $("#alert-default").removeClass("show");
                 } else {
-                    window.location.href = $("#indexUrl").val();
+                    window.location.href = "http://bfwechat.beautyfarm.com.cn:8009";
                 }
             }
         );
@@ -35,7 +36,7 @@ $(function () {
         if (url.indexOf("http") == -1) {
             url = "http://" + url;
         }
-        window.location.href = url + "?id=" + 10000 * Math.random();
+        window.location.href = "http://bfwechat.beautyfarm.com.cn:8009";
     });
 
 })

@@ -147,6 +147,7 @@ type AccountRegisterReq struct {
 	Name                string `json:"name"`
 	Phone               string `json:"phone"`
 	RegisterChannelType string `json:"registerChannelType"`
+	Gender              string `json:"gender"`
 }
 
 type AccountRegisterRes struct {

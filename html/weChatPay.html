@@ -17,6 +17,16 @@
     </div>
 </div>
 
+<div id="alert-default" class="alert alert-success mask show">
+    <div class="alert-content">
+        <span class="icon-ok">✔</span>
+        <p class="txt">支付中转页</p>
+        <p class="desc"></p>
+        <a href="" class="btn btn-primary btn-ok" id="sucessBtn">返回首页</a>
+    </div>
+</div>
+
+
 <input id="appId" type="hidden" value="{{ $.weChatLoginAddOrderParams.AppId }}"/>
 <input id="timeStamp" type="hidden" value="{{ $.weChatLoginAddOrderParams.TimeStamp }}"/>
 <input id="nonceStr" type="hidden" value="{{ $.weChatLoginAddOrderParams.NonceStr }}"/>

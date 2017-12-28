@@ -8,8 +8,6 @@ $(function () {
     }
 
     function refreshStatus() {
-        var processMsgObj = $("#processMsg");
-        processMsgObj.html("后台查询中...")
         var paystatus = $("#payStatus").val()
         if (paystatus == "2") {
             return;//已完成支付
@@ -29,6 +27,6 @@ $(function () {
         if (url.indexOf("http") == -1) {
             url = "http://" + url;
         }
-        window.open(url);
+        window.location.href = "http://bfwechat.beautyfarm.com.cn:8009";
     });
 })

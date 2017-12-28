@@ -21,13 +21,13 @@ func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	mobileNo := r.FormValue("mobileNo")
 	code := r.FormValue("code")
-	productIdStr:=r.FormValue("productId")
-	channelcode:=r.FormValue("channelcode")
+	productIdStr := r.FormValue("productId")
+	channelcode := r.FormValue("channelcode")
 	if productIdStr == "" {
 		productIdStr = "1"
 	}
 	productId, err := strconv.ParseInt(productIdStr, 10, 64)
-	productInfo:=dal.GetProductInfo(productId)
+	productInfo := dal.GetProductInfo(productId)
 	messagecCodeCookieName := fmt.Sprintf(config.ConfigInfo.CodeCookie, mobileNo)
 	cookieCode, err := r.Cookie(messagecCodeCookieName)
 	if err == nil {
@@ -44,7 +44,7 @@ func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	productCode := productInfo.Product_code // r.FormValue("productCode")
-	totalPrice := 1                              //1分钱
+	totalPrice := 1                         //1分钱
 	clientIp := r.Header.Get("Remote_addr")
 	if (clientIp == "") {
 		clientIp = r.RemoteAddr
@@ -75,7 +75,7 @@ func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
 
 	//闪客且没有下过订单
 	accountNo, _ := getAccountNo(mobileNo, username)
-	mappingOrderNo, _ := addTempOrder(username, mobileNo,productId, accountNo, channelcode, clientIp) //正式订单
+	mappingOrderNo, _ := addTempOrder(username, mobileNo, productId, accountNo, channelcode, clientIp) //正式订单
 	userAgent := r.Header.Get("User-Agent")
 	dal.AddLog(dal.LogInfo{Title: "User-Agent", Description: userAgent, Type: 1})
 	if mappingOrderNo != "" {
@@ -115,7 +115,7 @@ type AddOrderResponse struct {
 func addTempOrder(userName string, mobile string, productId int64, accountNo string, channel string, clientIp string) (mappingOrderNo string, res entity.BaseResultEntity) {
 	res = entity.GetBaseSucessRes()
 	mappingOrderNo = getMappingOrderNo()
-	p:=dal.GetProductInfo(productId)
+	p := dal.GetProductInfo(productId)
 	t := dal.TempOrder{
 		MappingOrderNo: mappingOrderNo,
 		UserName:       userName,
@@ -129,7 +129,7 @@ func addTempOrder(userName string, mobile string, productId int64, accountNo str
 		ProductName:    config.ConfigInfo.ProductName,
 		OrderStatus:    1,
 		ClientIp:       clientIp,
-		OrignalPrice:p.Orignal_price,
+		OrignalPrice:   p.Orignal_price,
 	}
 	isSucess := dal.AddTempOrder(t)
 	res.IsSucess = isSucess
@@ -148,6 +148,7 @@ func getAccountNo(mobile string, userName string) (accountNo string, isNewCreate
 	accountRegisterReq := proxy.AccountRegisterReq{}
 	accountRegisterReq.Phone = mobile
 	accountRegisterReq.Name = userName
+	accountRegisterReq.Gender = "2"
 	accountRegisterRes, serverRes := proxy.AddSoaAccount(accountRegisterReq)
 	if serverRes.IsSucess {
 		if accountRegisterRes.ErrorCode == "200" {
