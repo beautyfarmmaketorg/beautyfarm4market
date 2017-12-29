@@ -29,7 +29,7 @@ func HandlerWeChatLoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		weChatUnifiedorderResponse := InvokeWeChatUnifiedorder(tempOrderInfo.ProductCode, tempOrderInfo.ProductName,
 			mappingOrderNo,
-			tempOrderInfo.ClientIp, int(tempOrderInfo.TotalPrice), r.Host, "JSAPI", openId)
+			tempOrderInfo.ClientIp, tempOrderInfo.TotalPrice, r.Host, "JSAPI", openId)
 		if weChatUnifiedorderResponse.ReturnCode == "SUCCESS" && weChatUnifiedorderResponse.PrepayId != "" {
 			dal.UpdateTempOrderPayStatus(mappingOrderNo, 1) //更新支付状态
 			weChatLoginAddOrderParams := getWeChatLoginAddOrderParams(weChatUnifiedorderResponse.PrepayId, r.Host)

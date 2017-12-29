@@ -74,14 +74,15 @@ func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
 
 	//闪客且没有下过订单
 	accountNo, _ := getAccountNo(mobileNo, username)
-	mappingOrderNo, _ := addTempOrder(username, mobileNo, productId, accountNo, channelcode, clientIp) //正式订单
+	tempOrder, _ := addTempOrder(username, mobileNo, productId, accountNo, channelcode, clientIp) //正式订单
+	mappingOrderNo:=tempOrder.MappingOrderNo
 	userAgent := r.Header.Get("User-Agent")
 	dal.AddLog(dal.LogInfo{Title: "User-Agent", Description: userAgent, Type: 1})
 	if mappingOrderNo != "" {
 		if !strings.Contains(userAgent, "MicroMessenger") {
 			result.Code = "3" //成功下单跳转支付
 			weChatUnifiedorderResponse := InvokeWeChatUnifiedorder(productCode, "product", mappingOrderNo,
-				clientIp, productInfo.Price*100, r.Host, "MWEB", "")
+				clientIp, tempOrder.TotalPrice, r.Host, "MWEB", "")
 			if weChatUnifiedorderResponse.ReturnCode == "SUCCESS" && weChatUnifiedorderResponse.MwebUrl != "" {
 				dal.UpdateTempOrderPayStatus(mappingOrderNo, 1) //更新支付状态
 				host := r.Host
@@ -111,11 +112,11 @@ type AddOrderResponse struct {
 }
 
 //添加临时单
-func addTempOrder(userName string, mobile string, productId int64, accountNo string, channel string, clientIp string) (mappingOrderNo string, res entity.BaseResultEntity) {
+func addTempOrder(userName string, mobile string, productId int64, accountNo string, channel string, clientIp string) (t dal.TempOrder, res entity.BaseResultEntity) {
 	res = entity.GetBaseSucessRes()
-	mappingOrderNo = getMappingOrderNo()
+	mappingOrderNo:= getMappingOrderNo()
 	p := dal.GetProductInfo(productId)
-	t := dal.TempOrder{
+	t = dal.TempOrder{
 		MappingOrderNo: mappingOrderNo,
 		UserName:       userName,
 		MobileNo:       mobile,

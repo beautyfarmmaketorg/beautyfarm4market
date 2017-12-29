@@ -58,8 +58,8 @@ func processTempOrder(mappingOrderNo string, wechatOrderNo string, timeEnd strin
 		if addRes.IsSucess {
 			cardNo := addRes.CardNo
 			res = dal.UpdateTempOrder(cardNo, addRes.OrderNo, mappingOrderNo, wechatOrderNo, timeEnd)
-		}else {
-			dal.AddJsonLog("addFinalOrderFail" + mappingOrderNo,addRes)
+		} else {
+			dal.AddJsonLog("addFinalOrderFail"+mappingOrderNo, addRes)
 		}
 	}
 	return res
@@ -67,7 +67,7 @@ func processTempOrder(mappingOrderNo string, wechatOrderNo string, timeEnd strin
 
 //调用微信统一下单接口
 func InvokeWeChatUnifiedorder(productCode string, productName string,
-	orderCode string, spbill_create_ip string, totalPrice int, host string, tradeType string, openId string) WeChatUnifiedorderResponse {
+	orderCode string, spbill_create_ip string, totalPrice float64, host string, tradeType string, openId string) WeChatUnifiedorderResponse {
 	payResponse := WeChatUnifiedorderResponse{}
 	e := getwechatPayEntity(productCode, productName, orderCode, spbill_create_ip, totalPrice, host, tradeType, openId)
 	sign := getSign(e)
@@ -123,7 +123,7 @@ func check(e error) {
 }
 
 func getwechatPayEntity(productCode string, productName string,
-	orderCode string, spbill_create_ip string, totalPrice int, host string, tradeType string, openId string) wechatPayEntity {
+	orderCode string, spbill_create_ip string, totalPrice float64, host string, tradeType string, openId string) wechatPayEntity {
 	t := time.Now()
 	nonce_str := strconv.FormatInt(t.UTC().UnixNano(), 10)
 	notify_url := host + "/payCallBack" //异步回调
@@ -137,7 +137,7 @@ func getwechatPayEntity(productCode string, productName string,
 		Openid:           openId,
 		Out_trade_no:     orderCode,
 		Spbill_create_ip: spbill_create_ip,
-		Total_fee:        totalPrice,
+		Total_fee:        int(totalPrice) * 100,
 		Trade_type:       tradeType,
 	}
 	return entity
