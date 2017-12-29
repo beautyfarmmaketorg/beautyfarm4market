@@ -43,8 +43,7 @@ func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(result)
 		return
 	}
-	productCode := productInfo.Product_code // r.FormValue("productCode")
-	totalPrice := 1                         //1分钱
+	productCode := productInfo.Product_code // r.FormValue("productCode") 	//1分钱
 	clientIp := r.Header.Get("Remote_addr")
 	if (clientIp == "") {
 		clientIp = r.RemoteAddr
@@ -82,7 +81,7 @@ func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
 		if !strings.Contains(userAgent, "MicroMessenger") {
 			result.Code = "3" //成功下单跳转支付
 			weChatUnifiedorderResponse := InvokeWeChatUnifiedorder(productCode, "product", mappingOrderNo,
-				clientIp, totalPrice, r.Host, "MWEB", "")
+				clientIp, productInfo.Price*100, r.Host, "MWEB", "")
 			if weChatUnifiedorderResponse.ReturnCode == "SUCCESS" && weChatUnifiedorderResponse.MwebUrl != "" {
 				dal.UpdateTempOrderPayStatus(mappingOrderNo, 1) //更新支付状态
 				host := r.Host
@@ -130,6 +129,7 @@ func addTempOrder(userName string, mobile string, productId int64, accountNo str
 		OrderStatus:    1,
 		ClientIp:       clientIp,
 		OrignalPrice:   p.Orignal_price,
+		ProductId:      productId,
 	}
 	isSucess := dal.AddTempOrder(t)
 	res.IsSucess = isSucess
@@ -168,6 +168,9 @@ func getAccountNo(mobile string, userName string) (accountNo string, isNewCreate
 //是否是新用户
 func isVip(mobile string) bool {
 	isVip := false
+	if checkVip(mobile) {
+		return true
+	}
 	soaIsVipResOut, serverRes := proxy.IsVip(mobile)
 	if serverRes.IsSucess && soaIsVipResOut.Status == 1 {
 		isVip = soaIsVipResOut.Data.IsVip || soaIsVipResOut.Data.IsMarketVip
@@ -205,7 +208,7 @@ func addFinalOrder(userName string, mobile string, productCode string, accountNo
 func getMappingOrderNo() string {
 	t := time.Now()
 	timestamp := strconv.FormatInt(t.UTC().UnixNano(), 10)
-	return "P" + timestamp
+	return "BZ" + timestamp
 }
 
 func sendOrderSucessMessage(cardNo, productName, mobileNo string) bool {
@@ -228,4 +231,20 @@ func getCardNo(orderNo string) (cardNo, productName string) {
 		}
 	}
 	return
+}
+
+func checkVip(mobile string) bool {
+	contains := false
+	for _, v := range getVipMobiles() {
+		if v == mobile {
+			contains = true
+			break
+		}
+	}
+	return contains
+}
+
+func getVipMobiles() []string {
+	arr := []string{"15802586912", "13661658189", "13621207049", "15004305555", "13917534366", "13843036658", "13671507584", "18680877111", "13714521635", "13534208409", "13248211521", "15967893008", "15304315211", "18523573810", "13825215133", "13761445201"}
+	return arr
 }

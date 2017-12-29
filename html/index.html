@@ -5,6 +5,33 @@
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <title>纯新胶原精华护理</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        .mask{position: absolute;width: 100%;height: 100%; z-index: 11;background: url(assets/images/{{$.pageInfo.Mask}}) no-repeat center center;background-size: 100% 100%;}
+
+        .btn-purchase{ bottom: 25%;left: 50%;margin-left: -27px; width: 55px;height: 80px; background: url(assets/images/{{$.pageInfo.Button}}) no-repeat center center;}
+
+        .btn-rules{top: 30px;right: 0; width: 72px;height: 36px; background: url(assets/images/{{$.pageInfo.Rules}}) no-repeat center center;}
+        .btn-purchase,.btn-rules{position: absolute;background-size: 100% 100%;z-index: 9}
+
+        body,main::before{background: url(assets/images/{{$.pageInfo.Bg}}) no-repeat center center;background-size: 100% 100%;}
+    </style>
+
+    <script type="text/javascript">
+    (function(root) {
+        root._tt_config = true;
+        var ta = document.createElement('script'); ta.type = 'text/javascript'; ta.async = true;
+        ta.src = document.location.protocol + '//' + 's1.pstatp.com/bytecom/resource/track_log/src/toutiao-track-log.js';
+        ta.onerror = function () {
+            var request = new XMLHttpRequest();
+            var web_url = window.encodeURIComponent(window.location.href);
+            var js_url  = ta.src;
+            var url = '//ad.toutiao.com/link_monitor/cdn_failed?web_url=' + web_url + '&js_url=' + js_url + '&convert_id=83330938282';
+            request.open('GET', url, true);
+            request.send(null);
+        }
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ta, s);
+    })(window);
+    </script>;
 </head>
 <body>
 <main>
@@ -15,10 +42,7 @@
         <div class="alert-content">
             <p class="title">活动规则</p>
             <div class="desc">
-
-                <p>1.客人点击立即购买后弹窗，输入手机获取验证码，如判断为会员则无法接收验证码并且提示不可购买，判断为非会员则获取验证码并购买成功</p>
-
-                <p>2.购买成功的订单信息需要发送至CAM账户（通过CAM接口）</p>
+                <p>{{ $.pageInfo.RuleDesc }}</p>
             </div>
         </div>
         <a href="javascript:;" id="closeRules" class="btn btn-close" onclick="closeRules()">✕</a>

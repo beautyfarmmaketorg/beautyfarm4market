@@ -51,7 +51,8 @@ type TempOrder struct {
 	WechatorderNo  string
 	PayTime        string
 	ClientIp       string
-	OrignalPrice float64
+	OrignalPrice   float64
+	ProductId      int64
 }
 
 //mappingOrder_no, product_code, mobile_no, user_name, account_no,
@@ -59,11 +60,11 @@ type TempOrder struct {
 func AddTempOrder(t TempOrder) bool {
 	//插入数据
 	stmt, err := dbconnection.Prepare("INSERT temp_order SET mappingOrder_no=?,product_code=?,mobile_no=?," +
-		"user_name=?,account_no=?,total_price=?,order_status=?,pay_status=?,channel=?,create_date=?,modify_date=?,product_name=?,client_ip=?,orignal_price=?")
+		"user_name=?,account_no=?,total_price=?,order_status=?,pay_status=?,channel=?,create_date=?,modify_date=?,product_name=?,client_ip=?,orignal_price=?,product_id=?")
 	checkErr(err)
 
 	res, err := stmt.Exec(t.MappingOrderNo, t.ProductCode, t.MobileNo, t.UserName, t.AccountNo,
-		t.TotalPrice, t.OrderStatus, t.PayStatus, t.Channel, t.CreateDate, t.ModifyDate, t.ProductName, t.ClientIp,t.OrignalPrice)
+		t.TotalPrice, t.OrderStatus, t.PayStatus, t.Channel, t.CreateDate, t.ModifyDate, t.ProductName, t.ClientIp, t.OrignalPrice, t.ProductId)
 	checkErr(err)
 	rows, _ := res.RowsAffected()
 	return rows > 0
@@ -144,7 +145,7 @@ func toTempOrder(rows *sql.Rows) []TempOrder {
 		var orignal_price float64
 		errScan := rows.Scan(&mappingOrder_no, &product_code, &product_name, &mobile_no, &user_name,
 			&account_no, &total_price, &order_status,
-			&pay_status, &order_no, &card_no, &wechatorder_no, &pay_time, &channel, &create_date, &modify_date, &client_ip,&orignal_price)
+			&pay_status, &order_no, &card_no, &wechatorder_no, &pay_time, &channel, &create_date, &modify_date, &client_ip, &orignal_price)
 		checkErr(errScan)
 		t := TempOrder{
 			MappingOrderNo: mappingOrder_no,
@@ -164,7 +165,7 @@ func toTempOrder(rows *sql.Rows) []TempOrder {
 			WechatorderNo:  wechatorder_no,
 			PayTime:        pay_time,
 			ClientIp:       client_ip,
-			OrignalPrice:orignal_price,
+			OrignalPrice:   orignal_price,
 		}
 		tempOrders = append(tempOrders, t)
 	}
@@ -209,17 +210,18 @@ type ProductInfo struct {
 	Orignal_price      float64
 	Backgroud_image    string
 	Rule_image         string
+	Mask_image         string
 	PurhchaseBtn_image string
 	Isactive           int
 	Create_date        string
-	Product_code string
+	Product_code       string
 }
 
 func AddProductInfo(p ProductInfo) bool {
 	//插入数据
-	stmt, err := dbconnection.Prepare("INSERT product SET prodcut_name=?,prodcut_desc=?,prodcut_rule=?,price=?,orignal_price=?,backgroud_image=?,rule_image=?,purhchaseBtn_image=?,product_code=?")
+	stmt, err := dbconnection.Prepare("INSERT product SET prodcut_name=?,prodcut_desc=?,prodcut_rule=?,price=?,orignal_price=?,backgroud_image=?,rule_image=?,purhchaseBtn_image=?,product_code=?,mask_image=?")
 	checkErr(err)
-	res, err := stmt.Exec(p.Prodcut_name, p.Prodcut_desc, p.Prodcut_rule, p.Price, p.Orignal_price, p.Backgroud_image, p.Rule_image, p.PurhchaseBtn_image,p.Product_code)
+	res, err := stmt.Exec(p.Prodcut_name, p.Prodcut_desc, p.Prodcut_rule, p.Price, p.Orignal_price, p.Backgroud_image, p.Rule_image, p.PurhchaseBtn_image, p.Product_code, p.Mask_image)
 	checkErr(err)
 	rows, _ := res.RowsAffected()
 	return rows > 0
@@ -228,9 +230,9 @@ func AddProductInfo(p ProductInfo) bool {
 func UpdateProductInfo(p ProductInfo) bool {
 	//插入数据
 	stmt, err := dbconnection.Prepare("update product SET prodcut_name=?,prodcut_desc=?" +
-		",prodcut_rule=?,price=?,orignal_price=?,backgroud_image=?,rule_image=?,purhchaseBtn_image=?,product_code=? where product_id=?")
+		",prodcut_rule=?,price=?,orignal_price=?,backgroud_image=?,rule_image=?,purhchaseBtn_image=?,product_code=?,mask_image=? where product_id=?")
 	checkErr(err)
-	res, err := stmt.Exec(p.Prodcut_name, p.Prodcut_desc, p.Prodcut_rule, p.Price, p.Orignal_price, p.Backgroud_image, p.Rule_image, p.PurhchaseBtn_image,p.Product_code, p.Product_id)
+	res, err := stmt.Exec(p.Prodcut_name, p.Prodcut_desc, p.Prodcut_rule, p.Price, p.Orignal_price, p.Backgroud_image, p.Rule_image, p.PurhchaseBtn_image, p.Product_code, p.Mask_image, p.Product_id)
 	checkErr(err)
 	rows, _ := res.RowsAffected()
 	return rows > 0
@@ -264,9 +266,10 @@ func toProducts(rows *sql.Rows) []ProductInfo {
 		var isactive int
 		var create_date string
 		var product_code string
+		var mask_image string
 		errScan := rows.Scan(&product_id, &prodcut_name, &prodcut_desc, &prodcut_rule, &price,
 			&orignal_price, &backgroud_image, &rule_image,
-			&purhchaseBtn_image, &isactive, &create_date,&product_code)
+			&purhchaseBtn_image, &isactive, &create_date, &product_code, &mask_image)
 		checkErr(errScan)
 		p := ProductInfo{
 			Product_id:         product_id,
@@ -280,7 +283,8 @@ func toProducts(rows *sql.Rows) []ProductInfo {
 			PurhchaseBtn_image: purhchaseBtn_image,
 			Isactive:           isactive,
 			Create_date:        create_date,
-			Product_code:product_code,
+			Product_code:       product_code,
+			Mask_image:         mask_image,
 		}
 		products = append(products, p)
 	}
@@ -291,18 +295,17 @@ func toProducts(rows *sql.Rows) []ProductInfo {
 
 /*view log*/
 type ViewLog struct {
-	Pageview_id int64
-	Pange_url string
-	Client_ip string
+	Pageview_id  int64
+	Pange_url    string
+	Client_ip    string
 	Channel_code string
 }
-
 
 func AddViewLog(v ViewLog) bool {
 	//插入数据
 	stmt, err := dbconnection.Prepare("INSERT page_view SET pange_url=?,client_ip=?,channel_code=?")
 	checkErr(err)
-	res, err := stmt.Exec(v.Pange_url,v.Client_ip,v.Channel_code)
+	res, err := stmt.Exec(v.Pange_url, v.Client_ip, v.Channel_code)
 	checkErr(err)
 	rows, _ := res.RowsAffected()
 	return rows > 0
