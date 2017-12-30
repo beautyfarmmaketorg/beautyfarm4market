@@ -43,7 +43,7 @@ func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(result)
 		return
 	}
-	productCode := productInfo.Product_code // r.FormValue("productCode") 	//1分钱
+	productCode := productInfo.Product_code // r.FormValue("productCode")
 	clientIp := r.Header.Get("Remote_addr")
 	if (clientIp == "") {
 		clientIp = r.RemoteAddr
@@ -114,7 +114,7 @@ type AddOrderResponse struct {
 //添加临时单
 func addTempOrder(userName string, mobile string, productId int64, accountNo string, channel string, clientIp string) (t dal.TempOrder, res entity.BaseResultEntity) {
 	res = entity.GetBaseSucessRes()
-	mappingOrderNo:= getMappingOrderNo()
+	mappingOrderNo := getMappingOrderNo()
 	p := dal.GetProductInfo(productId)
 	t = dal.TempOrder{
 		MappingOrderNo: mappingOrderNo,
@@ -130,7 +130,7 @@ func addTempOrder(userName string, mobile string, productId int64, accountNo str
 		OrderStatus:    1,
 		ClientIp:       clientIp,
 		OrignalPrice:   p.Orignal_price,
-		ProductId:      productId,
+		ProductId:productId,
 	}
 	isSucess := dal.AddTempOrder(t)
 	res.IsSucess = isSucess
@@ -169,9 +169,6 @@ func getAccountNo(mobile string, userName string) (accountNo string, isNewCreate
 //是否是新用户
 func isVip(mobile string) bool {
 	isVip := false
-	if checkVip(mobile) {
-		return true
-	}
 	soaIsVipResOut, serverRes := proxy.IsVip(mobile)
 	if serverRes.IsSucess && soaIsVipResOut.Status == 1 {
 		isVip = soaIsVipResOut.Data.IsVip || soaIsVipResOut.Data.IsMarketVip
@@ -209,7 +206,7 @@ func addFinalOrder(userName string, mobile string, productCode string, accountNo
 func getMappingOrderNo() string {
 	t := time.Now()
 	timestamp := strconv.FormatInt(t.UTC().UnixNano(), 10)
-	return "BZ" + timestamp
+	return "P" + timestamp
 }
 
 func sendOrderSucessMessage(cardNo, productName, mobileNo string) bool {
@@ -232,20 +229,4 @@ func getCardNo(orderNo string) (cardNo, productName string) {
 		}
 	}
 	return
-}
-
-func checkVip(mobile string) bool {
-	contains := false
-	for _, v := range getVipMobiles() {
-		if v == mobile {
-			contains = true
-			break
-		}
-	}
-	return contains
-}
-
-func getVipMobiles() []string {
-	arr := []string{"15802586912", "13661658189", "13621207049", "15004305555", "13917534366", "13843036658", "13671507584", "18680877111", "13714521635", "13534208409", "13248211521", "15967893008", "15304315211", "18523573810", "13825215133", "13761445201"}
-	return arr
 }

@@ -3,8 +3,10 @@ $(function () {
         var mobileNo = $("#phone").val();
         var leftSecond = getLeftSecond(mobileNo);
         if (leftSecond > 0) {
+            $("#getValidCodeBtn").attr("disabled", true);
             $("#getValidCodeBtn").html(leftSecond + "s后重新发送");
         } else {
+            $("#getValidCodeBtn").removeAttr("disabled");
             $("#getValidCodeBtn").html("获取验证码");
         }
     }
@@ -21,7 +23,7 @@ $(function () {
             setInterval(handlerLeftSecond, 1000);
         }
         var productId = $("#productId").val();
-        $.get("/sendMsg", {"mobileNo": mobileNo,"productId":productId}, function (res) {
+        $.get("/sendMsg", {"mobileNo": mobileNo, "productId": productId}, function (res) {
             if (res.isSucess) {
                 showSucessMsg(res.message);
                 setInterval(handlerLeftSecond, 1000);
@@ -85,7 +87,13 @@ $(function () {
         var productId = $("#productId").val();
         var channelcode = $("#channelcode").val();
         var alertpurchase = $("#alert-purchase")
-        $.post("/addOrder", {"username": username, "mobileNo": mobileNo, "code": code,"productId":productId,"channelcode":channelcode}, function (res) {
+        $.post("/addOrder", {
+            "username": username,
+            "mobileNo": mobileNo,
+            "code": code,
+            "productId": productId,
+            "channelcode": channelcode
+        }, function (res) {
             if (res.isSucess) {
                 var intCode = parseInt(res.code);
                 if (intCode < 0) {

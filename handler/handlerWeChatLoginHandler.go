@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"strings"
 	"beautyfarm4market/util"
+	"html/template"
 )
 
 //记录openId 到cookie
@@ -22,9 +23,17 @@ func HandlerWeChatLoginHandler(w http.ResponseWriter, r *http.Request) {
 			Value: mappingOrderNo, Path: "/", Expires: time.Now().Add(time.Hour * 1), MaxAge: 8600}
 		http.SetCookie(w, &mappingOrderNoCookie) //记录订单号
 		tempOrderInfo := dal.GetOrdersByMappingOrderNo(mappingOrderNo);
+		if tempOrderInfo.MappingOrderNo=="" {
+			http.Redirect(w,r,r.Host,http.StatusFound);
+			return
+		}
 		if tempOrderInfo.PayStatus == 2 {
 			//已支付则跳转首页
-			util.RenderHtml(w, "index.html", nil)
+			locals := make(map[string]interface{})
+			p:=dal.GetProductInfo(tempOrderInfo.ProductId)
+			pageInfo := PageInfo{Channelcode: tempOrderInfo.Channel, ProductId: strconv.Itoa(int(tempOrderInfo.ProductId)), Bg: p.Backgroud_image, Button: p.PurhchaseBtn_image, Rule: p.Rule_image, Mask: p.MaskImage,RuleDesc:template.HTML(p.Prodcut_rule)}
+			locals["pageInfo"] = pageInfo
+			util.RenderHtml(w, "index.html", locals)
 			return
 		}
 		weChatUnifiedorderResponse := InvokeWeChatUnifiedorder(tempOrderInfo.ProductCode, tempOrderInfo.ProductName,

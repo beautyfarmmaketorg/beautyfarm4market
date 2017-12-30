@@ -41,7 +41,7 @@ func init() {
 	ConfigInfo = configEntity{
 		SmsUrl: "http://esms10.10690007.net/sms/mt",
 		//下单接口配置
-		OrderServiceUrl:    "http://180.169.107.155:8866/api/v1/bf-cam-adapter/spec/%s",
+		OrderServiceUrl:    "http://180.169.107.157:8866/api/v1/bf-cam-adapter/spec/%s",
 		AddOrderUrl:        "order/orderInsertOrUpdate",
 		GetOrderDetailUrl:  "order/orderDetailSelect?orderList=%s&appId=%s",
 		AccountRegisterUrl: "account/accountRegister",

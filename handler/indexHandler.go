@@ -5,6 +5,7 @@ import (
 	"beautyfarm4market/util"
 	"strconv"
 	"beautyfarm4market/dal"
+	"html/template"
 )
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
@@ -25,8 +26,8 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			locals := make(map[string]interface{})
-			pageInfo := PageInfo{Channelcode: channelcode, ProductId: productIdStr,
-			Bg:p.Backgroud_image,Button:p.PurhchaseBtn_image,Rules:p.Rule_image,Mask:p.Mask_image,RuleDesc:p.Prodcut_rule}
+			pageInfo := PageInfo{Channelcode: channelcode, ProductId: productIdStr, Bg: p.Backgroud_image,
+			Button: p.PurhchaseBtn_image, Rule: p.Rule_image, Mask: p.MaskImage,RuleDesc: template.HTML(p.Prodcut_rule)}
 			locals["pageInfo"] = pageInfo
 			util.RenderHtml(w, "index.html", locals)
 			return
@@ -40,9 +41,9 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 type PageInfo struct {
 	Channelcode string
 	ProductId   string
-	Mask string
-	Button string
-	Rules string
-	Bg string
-	RuleDesc string
+	Bg          string
+	Button      string
+	Rule        string
+	Mask        string
+	RuleDesc template.HTML
 }
