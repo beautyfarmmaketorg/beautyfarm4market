@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"beautyfarm4market/dal"
 	"reflect"
+	"log"
 )
 
 func SafeHandler(fn http.HandlerFunc) http.HandlerFunc {
@@ -13,6 +14,7 @@ func SafeHandler(fn http.HandlerFunc) http.HandlerFunc {
 			if e, ok := recover().(error); ok {
 				dal.AddLog(dal.LogInfo{Title: funName, Description: e.Error(), Type: 3})
 				http.Error(w, e.Error(), http.StatusInternalServerError)
+				log.Fatal(e.Error())
 			}
 		}()
 		fn(w, r)

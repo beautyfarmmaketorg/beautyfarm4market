@@ -1,4 +1,12 @@
 $(function () {
+    $(".backToIndex").bind("click",function () {
+        var url = $("#indexUrl").val();
+        if (url.indexOf("http") == -1) {
+            url = "http://" + url;
+        }
+        window.location.href = url;
+    });
+
     var payStatusObj = $("#payStatus")
     if (payStatusObj != undefined) {
         var paystatus = payStatusObj.val();
@@ -21,12 +29,4 @@ $(function () {
             }
         });
     }
-
-    $("#sucessBtn").click(function () {
-        var url = $("#indexUrl").val();
-        if (url.indexOf("http") == -1) {
-            url = "http://" + url;
-        }
-        window.location.href = "http://bfwechat.beautyfarm.com.cn:8009";
-    });
 })

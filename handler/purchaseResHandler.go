@@ -6,13 +6,16 @@ import (
 	"beautyfarm4market/entity"
 	"encoding/json"
 	"beautyfarm4market/dal"
+	"strconv"
 )
 
 func PurchaseResHandler(w http.ResponseWriter, r *http.Request) {
+	mappingOrderNo := r.FormValue("mappingOrderNo")
+	tempOrderInfo:=dal.GetOrdersByMappingOrderNo(mappingOrderNo)
+	indexUrl :=r.Host+"/?productId="+strconv.FormatInt(tempOrderInfo.ProductId,10)+"&channelcode="+tempOrderInfo.Channel
 	if r.Method == "GET" {
-		mappingOrderNo := r.FormValue("mappingOrderNo")
 		checkPurchaseResponse := getCheckPurchaseResponse(mappingOrderNo)
-		checkPurchaseResponse.IndexUrl = r.Host
+		checkPurchaseResponse.IndexUrl = indexUrl
 
 		locals := make(map[string]interface{})
 		locals["checkPurchaseResponse"] = checkPurchaseResponse
@@ -22,7 +25,7 @@ func PurchaseResHandler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json;charset=utf-8")
 		mappingOrderNo := r.FormValue("mappingOrderNo")
 		checkPurchaseResponse := getCheckPurchaseResponse(mappingOrderNo)
-		checkPurchaseResponse.IndexUrl = r.Host
+		checkPurchaseResponse.IndexUrl =indexUrl
 		json.NewEncoder(w).Encode(checkPurchaseResponse)
 		return
 	}

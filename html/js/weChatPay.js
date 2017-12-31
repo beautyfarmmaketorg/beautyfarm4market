@@ -31,12 +31,12 @@ $(function () {
         onBridgeReady();
     }
 
-    $("#sucessBtn").click(function () {
+    $(".backToIndex").bind("click",function () {
         var url = $("#indexUrl").val();
         if (url.indexOf("http") == -1) {
             url = "http://" + url;
         }
-        window.location.href = "http://bfwechat.beautyfarm.com.cn:8009";
+        window.location.href = url;
     });
 
 })

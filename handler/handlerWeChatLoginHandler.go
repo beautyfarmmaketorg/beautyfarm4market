@@ -41,27 +41,31 @@ func HandlerWeChatLoginHandler(w http.ResponseWriter, r *http.Request) {
 			tempOrderInfo.ClientIp, tempOrderInfo.TotalPrice, r.Host, "JSAPI", openId)
 		if weChatUnifiedorderResponse.ReturnCode == "SUCCESS" && weChatUnifiedorderResponse.PrepayId != "" {
 			dal.UpdateTempOrderPayStatus(mappingOrderNo, 1) //更新支付状态
-			weChatLoginAddOrderParams := getWeChatLoginAddOrderParams(weChatUnifiedorderResponse.PrepayId, r.Host)
+			weChatLoginAddOrderParams := getWeChatLoginAddOrderParams(weChatUnifiedorderResponse.PrepayId, r.Host+"/?productId="+strconv.FormatInt(tempOrderInfo.ProductId,10)+"&channelcode="+tempOrderInfo.Channel)
 			locals := make(map[string]interface{})
 			locals["weChatLoginAddOrderParams"] = weChatLoginAddOrderParams
 			dal.AddJsonLog("weChatPayLocals", weChatLoginAddOrderParams)
 			util.RenderHtml(w, "weChatPay.html", locals)
 			return
 		} else {
-			util.RenderHtml(w, "index.html", nil)
+			locals := make(map[string]interface{})
+			p:=dal.GetProductInfo(tempOrderInfo.ProductId)
+			pageInfo := PageInfo{Channelcode: tempOrderInfo.Channel, ProductId: strconv.Itoa(int(tempOrderInfo.ProductId)), Bg: p.Backgroud_image, Button: p.PurhchaseBtn_image, Rule: p.Rule_image, Mask: p.MaskImage,RuleDesc:template.HTML(p.Prodcut_rule)}
+			locals["pageInfo"] = pageInfo
+			util.RenderHtml(w, "index.html", locals)
 			return
 		}
 	}
 }
 
-func getWeChatLoginAddOrderParams(prepayId string, host string) WeChatLoginAddOrderParams {
+func getWeChatLoginAddOrderParams(prepayId string, indexUrl string) WeChatLoginAddOrderParams {
 	args := WeChatLoginAddOrderParams{
 		AppId:     config.ConfigInfo.WeChatAppId,
 		TimeStamp: strconv.FormatInt(time.Now().Unix(), 10),
 		NonceStr:  strconv.FormatInt(time.Now().Unix(), 10),
 		Package:   "prepay_id=" + prepayId,
 		SignType:  "MD5",
-		IndexUrl:  host,
+		IndexUrl:  indexUrl,
 	}
 	sign := getSign4WeChatPay(args)
 	args.PaySign = sign
