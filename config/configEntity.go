@@ -44,7 +44,7 @@ type configEntity struct {
 }
 
 func init() {
-	cfg := getConfig()
+	cfg := GetConfigFromXml()
 	ConfigInfo = configEntity{
 		SmsUrl: "http://esms10.10690007.net/sms/mt",
 		//下单接口配置
@@ -83,14 +83,15 @@ func init() {
 	fmt.Printf("init Config")
 }
 
-type config struct {
+type ConfigFromXml struct {
 	Dbname          string `xml:"dbname"`
 	PosService      string `xml:"posService"`
 	OrderServiceUrl string `xml:"orderServiceUrl"`
+	Port string `xml:"port"`
 }
 
-func getConfig() config {
-	cfg := config{}
+func GetConfigFromXml() ConfigFromXml {
+	cfg := ConfigFromXml{}
 	absoluteViewsDir := util.GetCurrentPath() + "/config.xml"
 	data, err := ioutil.ReadFile(absoluteViewsDir)
 	if err == nil {

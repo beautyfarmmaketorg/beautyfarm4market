@@ -1,5 +1,6 @@
 <xml>
-    <dbname>db_beautyfarm_market</dbname>
-    <posService>http://192.168.68.151:8070/%s</posService>
-    <orderServiceUrl>http://180.169.107.157:8866/api/v1/bf-cam-adapter/spec/%s</orderServiceUrl>
+    <dbname>db_beautyfarm_market_test</dbname>
+    <posService>http://pos.beautyfarm.com.cn:8070/%s</posService>
+    <orderServiceUrl>http://180.169.107.155:8866/api/v1/bf-cam-adapter/spec/%s</orderServiceUrl>
+    <port>:8007</port>
 </xml>

@@ -5,9 +5,11 @@ import (
 	"net/http"
 	"log"
 	_ "beautyfarm4market/config"
+	"beautyfarm4market/config"
 )
 
 func main() {
+	cfg := config.GetConfigFromXml()
 	mux := http.NewServeMux()
 	handler.StaticDirHandler(mux, "/assets/", 0)
 	mux.HandleFunc("/", handler.SafeHandler(handler.IndexHandler))
@@ -23,7 +25,7 @@ func main() {
 	mux.HandleFunc("/checkPurchaseRes", handler.SafeHandler(handler.PurchaseResHandler))
 	mux.HandleFunc("/handlerWeChatLogin", handler.SafeHandler(handler.HandlerWeChatLoginHandler))
 	mux.HandleFunc("/favicon.ico", handler.SafeHandler(handler.DefaultHandler))
-	err := http.ListenAndServe(":8009", mux)
+	err := http.ListenAndServe(cfg.Port, mux)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err.Error())
 	}

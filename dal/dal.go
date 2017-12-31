@@ -101,7 +101,7 @@ func GetAllOrders() []TempOrder {
 
 func GetOrdersByMobile(mobile string, productCode string) []TempOrder {
 	//查询数据
-	stmt, err := dbconnection.Prepare("select *  FROM db_beautyfarm_market.temp_order where mobile_no=? and product_code=? and pay_status=2 ")
+	stmt, err := dbconnection.Prepare("select *  FROM temp_order where mobile_no=? and product_code=? and pay_status=2 ")
 	checkErr(err)
 	rows, err := stmt.Query(mobile, productCode)
 	var tempOrders []TempOrder = toTempOrder(rows)
@@ -111,7 +111,7 @@ func GetOrdersByMobile(mobile string, productCode string) []TempOrder {
 func GetOrdersByMappingOrderNo(mappingOrderNo string) TempOrder {
 	var tempOrder TempOrder = TempOrder{MappingOrderNo: "",}
 	//查询数据
-	stmt, err := dbconnection.Prepare("select *  FROM db_beautyfarm_market.temp_order where mappingOrder_no=? ")
+	stmt, err := dbconnection.Prepare("select *  FROM temp_order where mappingOrder_no=? ")
 	checkErr(err)
 	rows, err := stmt.Query(mappingOrderNo)
 	var tempOrders []TempOrder = toTempOrder(rows)
@@ -243,7 +243,7 @@ func UpdateProductInfo(p ProductInfo) bool {
 func GetProductInfo(productId int64) ProductInfo {
 	p := ProductInfo{Product_id: int64(0),}
 	//查询数据
-	stmt, err := dbconnection.Prepare("select *  FROM db_beautyfarm_market.product where Product_id=? and isactive=1")
+	stmt, err := dbconnection.Prepare("select *  FROM product where Product_id=? and isactive=1")
 	checkErr(err)
 	rows, err := stmt.Query(productId)
 	var products []ProductInfo = toProducts(rows)
