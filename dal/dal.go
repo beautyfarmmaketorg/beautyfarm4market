@@ -6,6 +6,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"time"
 	"encoding/json"
+	"beautyfarm4market/config"
 )
 
 const (
@@ -13,14 +14,13 @@ const (
 	dbusername = "root"           //用户名
 	port       = 3306
 	dbpassword = "Beautyfarm886633"     //密码
-	dbname     = "db_beautyfarm_market" //db
 )
 
 var dbconnection *sql.DB
 
 func init() {
 	var err error
-	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8", dbusername, dbpassword, dbhostsip, port, dbname)
+	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8", dbusername, dbpassword, dbhostsip, port, config.ConfigInfo.Dbname)
 	dbconnection, err = sql.Open("mysql", dataSourceName)
 	checkErr(err)
 }

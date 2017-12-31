@@ -1,0 +1,5 @@
+<xml>
+    <dbname>db_beautyfarm_market</dbname>
+    <posService>http://192.168.68.151:8070/%s</posService>
+    <orderServiceUrl>http://180.169.107.157:8866/api/v1/bf-cam-adapter/spec/%s</orderServiceUrl>
+</xml>

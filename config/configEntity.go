@@ -1,6 +1,11 @@
 package config
 
-import "fmt"
+import (
+	"fmt"
+	"io/ioutil"
+	"beautyfarm4market/util"
+	"encoding/xml"
+)
 
 var ConfigInfo configEntity
 
@@ -35,13 +40,15 @@ type configEntity struct {
 	WeChatSecret        string //微信秘钥
 	ProxyDir            string
 	Version             string
+	Dbname              string
 }
 
 func init() {
+	cfg := getConfig()
 	ConfigInfo = configEntity{
 		SmsUrl: "http://esms10.10690007.net/sms/mt",
 		//下单接口配置
-		OrderServiceUrl:    "http://180.169.107.157:8866/api/v1/bf-cam-adapter/spec/%s",
+		OrderServiceUrl:    cfg.OrderServiceUrl,
 		AddOrderUrl:        "order/orderInsertOrUpdate",
 		GetOrderDetailUrl:  "order/orderDetailSelect?orderList=%s&appId=%s",
 		AccountRegisterUrl: "account/accountRegister",
@@ -50,13 +57,13 @@ func init() {
 		AccountNo:          "129147",
 		Channel:            "XS0001",
 		//下单接口配置END
-		SmsOfOrderSucess:    "您已成功购买产品%s，您的院余号为%s",
+		SmsOfOrderSucess:    "您已成功购买%s，凭证号为：%s。请直接致电门店预约后到店护理或拨打4008206142预约咨询。",
 		SmsOfVaild:          "%s（美丽田园手机验证码，请完成验证）， 如非本人操作，请忽略本短信。",
 		MobileCookie:        "code%s",
 		CodeCookie:          "messagecode%s",
 		TimeLayout:          "2006-01-02 15:04:05",
 		RegisterChannelType: "3003",
-		PosService:          "http://192.168.68.151:8070/%s",
+		PosService:          cfg.PosService,
 		IsVipUrl:            "customer/isVipMember?org_no=beautyfarm&mobile=%s&appid=%s&timestamp=%d&sign=%s",
 		SignTemplate:        "appid=%s&secretkey=%s&timestamp=%d",
 		PosServiceAppId:     "bf_market",
@@ -71,6 +78,23 @@ func init() {
 		WeChatSecret:        "077cb94b72154e7b3d7db95ba40a83cb",
 		ProxyDir:            "beautyfarm4market",
 		Version:             "v1",
+		Dbname:              cfg.Dbname,
 	}
 	fmt.Printf("init Config")
+}
+
+type config struct {
+	Dbname          string `xml:"dbname"`
+	PosService      string `xml:"posService"`
+	OrderServiceUrl string `xml:"orderServiceUrl"`
+}
+
+func getConfig() config {
+	cfg := config{}
+	absoluteViewsDir := util.GetCurrentPath() + "/config.xml"
+	data, err := ioutil.ReadFile(absoluteViewsDir)
+	if err == nil {
+		xml.Unmarshal(data, &cfg)
+	}
+	return cfg
 }

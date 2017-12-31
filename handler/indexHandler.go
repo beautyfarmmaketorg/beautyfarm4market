@@ -27,7 +27,8 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			locals := make(map[string]interface{})
 			pageInfo := PageInfo{Channelcode: channelcode, ProductId: productIdStr, Bg: p.Backgroud_image,
-			Button: p.PurhchaseBtn_image, Rule: p.Rule_image, Mask: p.MaskImage,RuleDesc: template.HTML(p.Prodcut_rule)}
+			Button: p.PurhchaseBtn_image, Rule: p.Rule_image, Mask: p.MaskImage,RuleDesc: template.HTML(p.Prodcut_rule),
+			ProductName:p.Prodcut_name}
 			locals["pageInfo"] = pageInfo
 			util.RenderHtml(w, "index.html", locals)
 			return
@@ -46,4 +47,5 @@ type PageInfo struct {
 	Rule        string
 	Mask        string
 	RuleDesc template.HTML
+	ProductName string
 }
