@@ -3,30 +3,35 @@ $(function () {
         var productId = $(this).attr("productId")
 
         $.get("/prodcutdetail", {"productId": productId}, function (data) {
-                var formObj = $("#productDetail form");
-                var props = Object.getOwnPropertyNames(data);
-                for (var i = 0; i < props.length; i++) {
-                    var propName = props[i];
-                    var propValue = data[props[i]];
-                    var valueFiledObj = $(".valueFiled[name='" + propName + "']");
-                    if (valueFiledObj != undefined) {
-                        var attrName = valueFiledObj.prop("tagName");
-                        if (attrName == "INPUT" || attrName == "TEXTAREA") {
-                            valueFiledObj.val(propValue);
-                        }
-                        else if (attrName == "SPAN") {
-                            {
-                                valueFiledObj.html(propValue);
-                            }
-                        }
-                    }
-                }
+                initFrom(data);
+                $("#idp").show();
+                $("#pIsactive").show();
                 $('#productDetail').modal({
                     keyboard: false
                 })
             }
         );
     });
+
+    function initFrom(data) {
+        var props = Object.getOwnPropertyNames(data);
+        for (var i = 0; i < props.length; i++) {
+            var propName = props[i];
+            var propValue = data[props[i]];
+            var valueFiledObj = $(".valueFiled[name='" + propName + "']");
+            if (valueFiledObj != undefined) {
+                var attrName = valueFiledObj.prop("tagName");
+                if (attrName == "INPUT" || attrName == "TEXTAREA") {
+                    valueFiledObj.val(propValue);
+                }
+                else if (attrName == "SPAN") {
+                    {
+                        valueFiledObj.html(propValue);
+                    }
+                }
+            }
+        }
+    }
 
     $("#submitBtn").bind("click", function () {
         var fileds = $(".valueFiled");
@@ -52,6 +57,7 @@ $(function () {
         $.post("/prodcutdetail", {"product": JSON.stringify(o)}, function (res) {
             if (res.isSucess) {
                 alert("更新成功");
+                $('#productDetail').modal('hide');
             }
         });
     });
@@ -60,6 +66,9 @@ $(function () {
         var productId = parseInt($("#productDetail [name='Product_id']").html());
         var imageObj = $(this).prev("[name='image']");
         var fileNameAttr = imageObj.attr("fileName");
+        if (isNaN(productId)) {
+            productId = Date.parse(new Date());
+        }
         var fileName = productId + "_" + fileNameAttr;
         if (imageObj.val() == "") {
             return;
@@ -84,6 +93,26 @@ $(function () {
                 }
             }
         });
+    })
 
+    $("#addProduct").bind("click", function () {
+        $("#idp").hide();
+        $("#pIsactive").hide();
+        var obj = {
+            "Prodcut_name": "",
+            "Prodcut_desc": "",
+            "Prodcut_rule": "",
+            "Price": "",
+            "Orignal_price": "",
+            "Backgroud_image": "",
+            "Rule_image": "",
+            "PurhchaseBtn_image": "",
+            "Product_code": "",
+            "MaskImage": ""
+        };
+        initFrom(obj);
+        $('#productDetail').modal({
+            keyboard: false
+        })
     })
 })

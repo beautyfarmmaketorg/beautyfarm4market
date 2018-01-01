@@ -1,49 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
     <title>订单列表</title>
 </head>
 <body>
-<table>
+<nav class="navbar navbar-default navbar-fixed-top" style="background: #96b97d;">
+    <div class="container">
+        <div class="navbar-header logo"><h1>
+            <a target="_blank" href="/" style="display: block;">Beautyfarm.com.cn</a></h1>
+        </div>
+    </div>
+</nav>
+<table class="table table-striped" style="margin-top: 30px;">
+    <caption>订单列表</caption>
     <thead>
-    <td>本地订单号</td>
-    <td>code</td>
-    <td>名称</td>
-    <td>手机</td>
-    <td>姓名</td>
-    <td>账号</td>
-    <td>总价</td>
-    <td>订单状态</td>
-    <td>支付状态</td>
-    <td>CAM订单号</td>
-    <td>院余号</td>
-    <td>微信订单号</td>
-    <td>渠道</td>
-    <td>下单日期</td>
-    <td>最后更新</td>
+    <tr>
+        <th>本地订单号</th>
+        <th>code</th>
+        <th>名称</th>
+        <th>手机</th>
+        <th>姓名</th>
+        <th>账号</th>
+        <th>总价</th>
+        <th title="订单状态 1 已下临时单  2 已下正式单 3取消">订单状态</th>
+        <th title="支付状态 0未支付 1 支付中 2已支付  已退款">支付状态</th>
+        <th>CAM订单号</th>
+        <th>院余号</th>
+        <th>微信订单号</th>
+        <th>渠道</th>
+        <th>下单日期</th>
+        <th>最后更新</th>
+    </tr>
     </thead>
     <tbody>
     {{range $.orders}}
-        <tr>
-            <td>{{.MappingOrderNo}}</td>
-            <td>{{.ProductCode}}</td>
-            <td>{{.ProductName}}</td>
-            <td>{{.MobileNo}}</td>
-            <td>{{.UserName}}</td>
-            <td>{{.AccountNo}}</td>
-            <td>{{.TotalPrice}}</td>
-            <td>{{.OrderStatus}}</td>
-            <td>{{.PayStatus}}</td>
-            <td>{{.OrderNo}}</td>
-            <td>{{.CardNo}}</td>
-            <td>{{.WechatorderNo}}</td>
-            <td>{{.Channel}}</td>
-            <td>{{.CreateDate}}</td>
-            <td>{{.ModifyDate}}</td>
-        </tr>
+    <tr>
+        <td>{{.MappingOrderNo}}</td>
+        <td>{{.ProductCode}}</td>
+        <td>{{.ProductName}}</td>
+        <td>{{.MobileNo}}</td>
+        <td>{{.UserName}}</td>
+        <td>{{.AccountNo}}</td>
+        <td>{{.TotalPrice}}</td>
+        <td>{{.OrderStatus}}</td>
+        <td>{{.PayStatus}}</td>
+        <td>{{.OrderNo}}</td>
+        <td>{{.CardNo}}</td>
+        <td>{{.WechatorderNo}}</td>
+        <td>{{.Channel}}</td>
+        <td>{{.CreateDate}}</td>
+        <td>{{.ModifyDate}}</td>
+    </tr>
     {{end}}
     </tbody>
 </table>
+<script src="assets/js/jquery.min.js" language="javascript"></script>
+<script src="assets/js/bootstrap.min.js" language="javascript"></script>
 </body>
 </html>

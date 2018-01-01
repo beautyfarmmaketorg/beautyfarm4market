@@ -8,6 +8,8 @@ import (
 	"path"
 	"beautyfarm4market/entity"
 	"encoding/json"
+	"math/rand"
+	"strconv"
 )
 
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
@@ -20,7 +22,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		filename := r.FormValue("fileName") + path.Ext(h.Filename)
+		filename := r.FormValue("fileName")+strconv.Itoa(rand.Intn(100)) + path.Ext(h.Filename)
 		if filename == "" {
 			filename = h.Filename
 		}

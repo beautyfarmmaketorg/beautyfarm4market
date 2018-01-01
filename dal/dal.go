@@ -13,7 +13,7 @@ const (
 	dbhostsip  = "116.62.194.207" //IP地址
 	dbusername = "root"           //用户名
 	port       = 3306
-	dbpassword = "Beautyfarm886633"     //密码
+	dbpassword = "Beautyfarm886633" //密码
 )
 
 var dbconnection *sql.DB
@@ -51,8 +51,8 @@ type TempOrder struct {
 	WechatorderNo  string
 	PayTime        string
 	ClientIp       string
-	OrignalPrice float64
-	ProductId int64
+	OrignalPrice   float64
+	ProductId      int64
 }
 
 //mappingOrder_no, product_code, mobile_no, user_name, account_no,
@@ -64,7 +64,7 @@ func AddTempOrder(t TempOrder) bool {
 	checkErr(err)
 
 	res, err := stmt.Exec(t.MappingOrderNo, t.ProductCode, t.MobileNo, t.UserName, t.AccountNo,
-		t.TotalPrice, t.OrderStatus, t.PayStatus, t.Channel, t.CreateDate, t.ModifyDate, t.ProductName, t.ClientIp,t.OrignalPrice,t.ProductId)
+		t.TotalPrice, t.OrderStatus, t.PayStatus, t.Channel, t.CreateDate, t.ModifyDate, t.ProductName, t.ClientIp, t.OrignalPrice, t.ProductId)
 	checkErr(err)
 	rows, _ := res.RowsAffected()
 	return rows > 0
@@ -146,7 +146,7 @@ func toTempOrder(rows *sql.Rows) []TempOrder {
 		var product_id int64
 		errScan := rows.Scan(&mappingOrder_no, &product_code, &product_name, &mobile_no, &user_name,
 			&account_no, &total_price, &order_status,
-			&pay_status, &order_no, &card_no, &wechatorder_no, &pay_time, &channel, &create_date, &modify_date, &client_ip,&orignal_price,&product_id)
+			&pay_status, &order_no, &card_no, &wechatorder_no, &pay_time, &channel, &create_date, &modify_date, &client_ip, &orignal_price, &product_id)
 		checkErr(errScan)
 		t := TempOrder{
 			MappingOrderNo: mappingOrder_no,
@@ -166,8 +166,8 @@ func toTempOrder(rows *sql.Rows) []TempOrder {
 			WechatorderNo:  wechatorder_no,
 			PayTime:        pay_time,
 			ClientIp:       client_ip,
-			OrignalPrice:orignal_price,
-			ProductId:product_id,
+			OrignalPrice:   orignal_price,
+			ProductId:      product_id,
 		}
 		tempOrders = append(tempOrders, t)
 	}
@@ -215,15 +215,15 @@ type ProductInfo struct {
 	PurhchaseBtn_image string
 	Isactive           int
 	Create_date        string
-	Product_code string
-	MaskImage string
+	Product_code       string
+	MaskImage          string
 }
 
 func AddProductInfo(p ProductInfo) bool {
 	//插入数据
 	stmt, err := dbconnection.Prepare("INSERT product SET prodcut_name=?,prodcut_desc=?,prodcut_rule=?,price=?,orignal_price=?,backgroud_image=?,rule_image=?,purhchaseBtn_image=?,product_code=?,mask_image=?")
 	checkErr(err)
-	res, err := stmt.Exec(p.Prodcut_name, p.Prodcut_desc, p.Prodcut_rule, p.Price, p.Orignal_price, p.Backgroud_image, p.Rule_image, p.PurhchaseBtn_image,p.Product_code,p.MaskImage)
+	res, err := stmt.Exec(p.Prodcut_name, p.Prodcut_desc, p.Prodcut_rule, p.Price, p.Orignal_price, p.Backgroud_image, p.Rule_image, p.PurhchaseBtn_image, p.Product_code, p.MaskImage)
 	checkErr(err)
 	rows, _ := res.RowsAffected()
 	return rows > 0
@@ -235,18 +235,19 @@ func UpdateProductInfo(p ProductInfo) bool {
 		",prodcut_rule=?,price=?,orignal_price=?,backgroud_image=?,rule_image=?,purhchaseBtn_image=?,product_code=?,mask_image=?,isactive=? where product_id=?")
 	checkErr(err)
 	res, err := stmt.Exec(p.Prodcut_name, p.Prodcut_desc, p.Prodcut_rule, p.Price, p.Orignal_price, p.Backgroud_image,
-		p.Rule_image, p.PurhchaseBtn_image,p.Product_code,p.MaskImage,p.Isactive, p.Product_id)
+		p.Rule_image, p.PurhchaseBtn_image, p.Product_code, p.MaskImage, p.Isactive, p.Product_id)
 	checkErr(err)
-	rows, _ := res.RowsAffected()
-	return rows > 0
+	_, err = res.RowsAffected()
+	checkErr(err)
+	return true
 }
 
-func GetProductInfo(productId int64,checkActive bool) ProductInfo {
+func GetProductInfo(productId int64, checkActive bool) ProductInfo {
 	p := ProductInfo{Product_id: int64(0),}
 	//查询数据
-	sql:="select *  FROM product where Product_id=?"
+	sql := "select *  FROM product where Product_id=?"
 	if checkActive {
-		sql+=" and isactive=1"
+		sql += " and isactive=1"
 	}
 	stmt, err := dbconnection.Prepare(sql)
 	checkErr(err)
@@ -285,7 +286,7 @@ func toProducts(rows *sql.Rows) []ProductInfo {
 		var mask_image string
 		errScan := rows.Scan(&product_id, &prodcut_name, &prodcut_desc, &prodcut_rule, &price,
 			&orignal_price, &backgroud_image, &rule_image,
-			&purhchaseBtn_image, &isactive, &create_date,&product_code,&mask_image)
+			&purhchaseBtn_image, &isactive, &create_date, &product_code, &mask_image)
 		checkErr(errScan)
 		p := ProductInfo{
 			Product_id:         product_id,
@@ -299,8 +300,8 @@ func toProducts(rows *sql.Rows) []ProductInfo {
 			PurhchaseBtn_image: purhchaseBtn_image,
 			Isactive:           isactive,
 			Create_date:        create_date,
-			Product_code:product_code,
-			MaskImage:mask_image,
+			Product_code:       product_code,
+			MaskImage:          mask_image,
 		}
 		products = append(products, p)
 	}
@@ -311,21 +312,87 @@ func toProducts(rows *sql.Rows) []ProductInfo {
 
 /*view log*/
 type ViewLog struct {
-	Pageview_id int64
-	Pange_url string
-	Client_ip string
+	Pageview_id  int64
+	Pange_url    string
+	Client_ip    string
 	Channel_code string
 }
-
 
 func AddViewLog(v ViewLog) bool {
 	//插入数据
 	stmt, err := dbconnection.Prepare("INSERT page_view SET pange_url=?,client_ip=?,channel_code=?")
 	checkErr(err)
-	res, err := stmt.Exec(v.Pange_url,v.Client_ip,v.Channel_code)
+	res, err := stmt.Exec(v.Pange_url, v.Client_ip, v.Channel_code)
 	checkErr(err)
 	rows, _ := res.RowsAffected()
 	return rows > 0
 }
 
 /*view log*/
+
+/*流量统计*/
+type ViewLogReportEntity struct {
+	ChannelCode string
+	TotalView   int
+}
+
+func GetViewLogReport() []ViewLogReportEntity {
+	//查询数据
+	rows, err := dbconnection.Query("SELECT channel_code,COUNT(1) as totalView from page_view GROUP BY channel_code ;")
+	checkErr(err)
+	var ViewLogReportArr []ViewLogReportEntity = toViewLogReport(rows)
+	return ViewLogReportArr
+}
+
+func toViewLogReport(rows *sql.Rows) []ViewLogReportEntity {
+	var viewLogReportArr []ViewLogReportEntity
+	for rows.Next() {
+		var channel_code string
+		var totalView int
+		errScan := rows.Scan(&channel_code, &totalView)
+		checkErr(errScan)
+		r := ViewLogReportEntity{
+			ChannelCode: channel_code,
+			TotalView:   totalView,
+		}
+		viewLogReportArr = append(viewLogReportArr, r)
+	}
+	return viewLogReportArr
+}
+
+/*流量统计*/
+
+/*订单统计*/
+type OrderReportEntity struct {
+	Channel    string
+	ProductId  int64
+	Ordercount int
+}
+
+func GetOrderReport() []OrderReportEntity {
+	//查询数据
+	rows, err := dbconnection.Query("SELECT  channel,product_id,count(1) as ordercount from temp_order WHERE order_status=2 GROUP BY channel,product_id ;")
+	checkErr(err)
+	var orderReportArr []OrderReportEntity = toOrderReport(rows)
+	return orderReportArr
+}
+
+func toOrderReport(rows *sql.Rows) []OrderReportEntity {
+	var orderReportEntityArr []OrderReportEntity
+	for rows.Next() {
+		var channel string
+		var product_id int64
+		var ordercount int
+		errScan := rows.Scan(&channel, &product_id, &ordercount)
+		checkErr(errScan)
+		r := OrderReportEntity{
+			Channel:    channel,
+			ProductId:  product_id,
+			Ordercount: ordercount,
+		}
+		orderReportEntityArr = append(orderReportEntityArr, r)
+	}
+	return orderReportEntityArr
+}
+
+/*订单统计*/

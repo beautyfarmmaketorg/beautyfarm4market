@@ -27,6 +27,8 @@ func main() {
 	mux.HandleFunc("/favicon.ico", handler.SafeHandler(handler.DefaultHandler))
 	mux.HandleFunc("/prodcut", handler.SafeHandler(handler.ProductHandler))
 	mux.HandleFunc("/prodcutdetail", handler.SafeHandler(handler.ProductDetailHandler))
+	mux.HandleFunc("/report", handler.SafeHandler(handler.ReportHandler))
+	mux.HandleFunc("/backyard", handler.SafeHandler(handler.BackyardHandler))
 	err := http.ListenAndServe(cfg.Port, mux)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err.Error())

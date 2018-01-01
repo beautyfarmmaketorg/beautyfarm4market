@@ -6,14 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="icon" href="../../favicon.ico">
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <title>产品列表</title>
 </head>
 
 <body>
-
-<table class="table table-striped">
+<nav class="navbar navbar-default navbar-fixed-top" style="background: #96b97d;">
+    <div class="container">
+        <div class="navbar-header logo"><h1>
+            <a target="_blank" href="/" style="display: block;">Beautyfarm.com.cn</a></h1>
+        </div>
+    </div>
+</nav>
+<table class="table table-striped" style="margin-top: 30px;">
     <caption>产品列表</caption>
+    <caption><input type="button"  class="btn btn-success" value="新增产品" id="addProduct"></caption>
     <thead>
     <tr>
         <th>id</th>
@@ -62,16 +69,17 @@
                 <h4 class="modal-title" id="myModalLabel">产品编辑</h4>
             </div>
             <div class="modal-body" style="overflow-y:scroll">
-                <form method="post" action="prodcut"  enctype='multipart/form-data' >
-                    <p><label>id</label><span name="Product_id" class="valueFiled"></span></p>
+                <form method="post" action="prodcut" enctype='multipart/form-data'>
+                    <p id="idp"><label>id</label><span name="Product_id" class="valueFiled"></span></p>
                     <p><label>code</label><input name="Product_code" class="valueFiled"></input></p>
                     <p><label>名称</label><input name="Prodcut_name" class="valueFiled"></input></p>
-                    <p><label>详情</label><textarea name="Prodcut_rule" class="valueFiled" rows="10" cols="20"></textarea></p>
+                    <p><label>详情</label><textarea name="Prodcut_rule" class="valueFiled" rows="10" cols="20"></textarea>
+                    </p>
                     <p><label>活动价格</label><input name="Price" class="valueFiled"></input></p>
                     <p><label>原始价格</label><input name="Orignal_price" class="valueFiled"></input></p>
                     <p><label>背景图</label><span name="Backgroud_image" class="valueFiled"></span>
                         <input name="image" type="file" fileName="Backgroud_image"/>
-                        <input type="button" class="uploadImageBtn" value="上传" /></p>
+                        <input type="button" class="uploadImageBtn" value="上传"/></p>
                     <p><label>详情按钮图</label><span name="Rule_image" class="valueFiled"></span>
                         <input name="image" type="file" fileName="Rule_image"/>
                         <input type="button" class="uploadImageBtn" value="上传"/></p>
@@ -81,10 +89,10 @@
                         <input type="button" class="uploadImageBtn" value="上传"/></p>
                     </p>
                     <p><label>虚幻背景图</label><span name="MaskImage" class="valueFiled"></span>
-                        <input name="image" type="file" fileName="PurhchaseBtn_image"/>
-                        <input type="button" class="uploadImageBtn" value="上传" /></p>
+                        <input name="image" type="file" fileName="MaskImage"/>
+                        <input type="button" class="uploadImageBtn" value="上传"/></p>
                     </p>
-                    <p><label>是否可用</label><input name="Isactive" class="valueFiled"></input></p>
+                    <p id="pIsactive"><label>是否可用</label><input name="Isactive" class="valueFiled"></input></p>
                 </form>
             </div>
             <div class="modal-footer">

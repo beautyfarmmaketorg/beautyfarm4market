@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <title>报表</title>
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" style="background: #96b97d;">
+    <div class="container">
+        <div class="navbar-header logo"><h1>
+            <a target="_blank" href="/" style="display: block;">Beautyfarm.com.cn</a></h1>
+        </div>
+    </div>
+</nav>
+
+<table class="table table-striped" style="margin-top: 80px;">
+    <caption>流量报表</caption>
+    <thead>
+    <tr>
+        <th>渠道</th>
+        <th>总量</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{range $.viewLogReports}}
+    <tr>
+        <td>{{.ChannelCode}}</td>
+        <td>{{.TotalView}}</td>
+    </tr>
+    {{end}}
+    </tbody>
+</table>
+<hr/>
+<table class="table table-striped" style="margin-top: 30px;">
+    <caption>订单报表</caption>
+    <thead>
+    <tr>
+        <th>渠道</th>
+        <th>产品id</th>
+        <th>订单量</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{range $.orderReports}}
+    <tr>
+        <td>{{.Channel}}</td>
+        <td>{{.ProductId}}</td>
+        <td>{{.Ordercount}}</td>
+    </tr>
+    {{end}}
+    </tbody>
+</table>
+<script src="assets/js/jquery.min.js" language="javascript"></script>
+<script src="assets/js/bootstrap.min.js" language="javascript"></script>
+
+</body>
+</html>
