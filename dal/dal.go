@@ -232,18 +232,23 @@ func AddProductInfo(p ProductInfo) bool {
 func UpdateProductInfo(p ProductInfo) bool {
 	//插入数据
 	stmt, err := dbconnection.Prepare("update product SET prodcut_name=?,prodcut_desc=?" +
-		",prodcut_rule=?,price=?,orignal_price=?,backgroud_image=?,rule_image=?,purhchaseBtn_image=?,product_code=?,mask_image=? where product_id=?")
+		",prodcut_rule=?,price=?,orignal_price=?,backgroud_image=?,rule_image=?,purhchaseBtn_image=?,product_code=?,mask_image=?,isactive=? where product_id=?")
 	checkErr(err)
-	res, err := stmt.Exec(p.Prodcut_name, p.Prodcut_desc, p.Prodcut_rule, p.Price, p.Orignal_price, p.Backgroud_image, p.Rule_image, p.PurhchaseBtn_image,p.Product_code,p.MaskImage, p.Product_id)
+	res, err := stmt.Exec(p.Prodcut_name, p.Prodcut_desc, p.Prodcut_rule, p.Price, p.Orignal_price, p.Backgroud_image,
+		p.Rule_image, p.PurhchaseBtn_image,p.Product_code,p.MaskImage,p.Isactive, p.Product_id)
 	checkErr(err)
 	rows, _ := res.RowsAffected()
 	return rows > 0
 }
 
-func GetProductInfo(productId int64) ProductInfo {
+func GetProductInfo(productId int64,checkActive bool) ProductInfo {
 	p := ProductInfo{Product_id: int64(0),}
 	//查询数据
-	stmt, err := dbconnection.Prepare("select *  FROM product where Product_id=? and isactive=1")
+	sql:="select *  FROM product where Product_id=?"
+	if checkActive {
+		sql+=" and isactive=1"
+	}
+	stmt, err := dbconnection.Prepare(sql)
 	checkErr(err)
 	rows, err := stmt.Query(productId)
 	var products []ProductInfo = toProducts(rows)
@@ -251,6 +256,15 @@ func GetProductInfo(productId int64) ProductInfo {
 		p = products[0]
 	}
 	return p
+}
+
+func GetAllProductInfos() []ProductInfo {
+	//查询数据
+	stmt, err := dbconnection.Prepare("select *  FROM product")
+	checkErr(err)
+	rows, err := stmt.Query()
+	var products []ProductInfo = toProducts(rows)
+	return products
 }
 
 func toProducts(rows *sql.Rows) []ProductInfo {

@@ -27,7 +27,7 @@ func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
 		productIdStr = "1"
 	}
 	productId, err := strconv.ParseInt(productIdStr, 10, 64)
-	productInfo := dal.GetProductInfo(productId)
+	productInfo := dal.GetProductInfo(productId,true)
 	messagecCodeCookieName := fmt.Sprintf(config.ConfigInfo.CodeCookie, mobileNo)
 	cookieCode, err := r.Cookie(messagecCodeCookieName)
 	if err == nil {
@@ -115,7 +115,7 @@ type AddOrderResponse struct {
 func addTempOrder(userName string, mobile string, productId int64, accountNo string, channel string, clientIp string) (t dal.TempOrder, res entity.BaseResultEntity) {
 	res = entity.GetBaseSucessRes()
 	mappingOrderNo := getMappingOrderNo()
-	p := dal.GetProductInfo(productId)
+	p := dal.GetProductInfo(productId,true)
 	t = dal.TempOrder{
 		MappingOrderNo: mappingOrderNo,
 		UserName:       userName,

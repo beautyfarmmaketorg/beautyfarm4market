@@ -25,7 +25,7 @@ func MessageHandler(w http.ResponseWriter, r *http.Request) {
 			productIdStr = "1"
 		}
 		productId, _ := strconv.ParseInt(productIdStr, 10, 64)
-		productInfo:=dal.GetProductInfo(productId)
+		productInfo:=dal.GetProductInfo(productId,true)
 		productCode :=productInfo.Product_code
 		//检查是否已经下过订单
 		if hasOrdered := checkHasOrdered(mobileNo, productCode); hasOrdered {

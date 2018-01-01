@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -8,9 +7,97 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <link rel="icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
 </head>
 
 <body>
 
+<table class="table table-striped">
+    <caption>产品列表</caption>
+    <thead>
+    <tr>
+        <th>id</th>
+        <th>code</th>
+        <th>名称</th>
+        <th>活动价格</th>
+        <th>原始价格</th>
+        <th>背景图</th>
+        <th>详情按钮图</th>
+        <th>购买按钮图</th>
+        <th>虚幻背景图</th>
+        <th>是否可用</th>
+        <th>创建日期</th>
+        <th>操作</th>
+    <tr>
+    </thead>
+    <tbody>
+    {{range $.allProducts}}
+    <tr>
+        <td>{{.Product_id}}</td>
+        <td>{{.Product_code}}</td>
+        <td>{{.Prodcut_name}}</td>
+        <td>{{.Price}}</td>
+        <td>{{.Orignal_price}}</td>
+        <td>{{.Backgroud_image}}</td>
+        <td>{{.Rule_image}}</td>
+        <td>{{.PurhchaseBtn_image}}</td>
+        <td>{{.MaskImage}}</td>
+        <td>{{.Isactive}}</td>
+        <td>{{.Create_date}}</td>
+        <td>
+            <button productId={{.Product_id}} class="productEditBtn">编辑</button>
+            <a href="/?productId={{.Product_id}}" target="_blank">预览</a>
+        </td>
+    </tr>
+    {{end}}
+    </tbody>
+</table>
+
+<div id="productDetail" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">产品编辑</h4>
+            </div>
+            <div class="modal-body" style="overflow-y:scroll">
+                <form method="post" action="prodcut"  enctype='multipart/form-data' >
+                    <p><label>id</label><span name="Product_id" class="valueFiled"></span></p>
+                    <p><label>code</label><input name="Product_code" class="valueFiled"></input></p>
+                    <p><label>名称</label><input name="Prodcut_name" class="valueFiled"></input></p>
+                    <p><label>详情</label><textarea name="Prodcut_rule" class="valueFiled" rows="10" cols="20"></textarea></p>
+                    <p><label>活动价格</label><input name="Price" class="valueFiled"></input></p>
+                    <p><label>原始价格</label><input name="Orignal_price" class="valueFiled"></input></p>
+                    <p><label>背景图</label><span name="Backgroud_image" class="valueFiled"></span>
+                        <input name="image" type="file" fileName="Backgroud_image"/>
+                        <input type="button" class="uploadImageBtn" value="上传" /></p>
+                    <p><label>详情按钮图</label><span name="Rule_image" class="valueFiled"></span>
+                        <input name="image" type="file" fileName="Rule_image"/>
+                        <input type="button" class="uploadImageBtn" value="上传"/></p>
+                    </p>
+                    <p><label>购买按钮图</label><span name="PurhchaseBtn_image" class="valueFiled"></span>
+                        <input name="image" type="file" fileName="PurhchaseBtn_image"/>
+                        <input type="button" class="uploadImageBtn" value="上传"/></p>
+                    </p>
+                    <p><label>虚幻背景图</label><span name="MaskImage" class="valueFiled"></span>
+                        <input name="image" type="file" fileName="PurhchaseBtn_image"/>
+                        <input type="button" class="uploadImageBtn" value="上传" /></p>
+                    </p>
+                    <p><label>是否可用</label><input name="Isactive" class="valueFiled"></input></p>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="submitBtn">提交更改</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="assets/js/jquery.min.js" language="javascript"></script>
+<script src="assets/js/bootstrap.min.js" language="javascript"></script>
+<script src="assets/js/product.js" language="javascript"></script>
+</body>
+</html>
 </body>
 </html>

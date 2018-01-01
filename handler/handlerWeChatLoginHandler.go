@@ -30,7 +30,7 @@ func HandlerWeChatLoginHandler(w http.ResponseWriter, r *http.Request) {
 		if tempOrderInfo.PayStatus == 2 {
 			//已支付则跳转首页
 			locals := make(map[string]interface{})
-			p:=dal.GetProductInfo(tempOrderInfo.ProductId)
+			p:=dal.GetProductInfo(tempOrderInfo.ProductId,true)
 			pageInfo := PageInfo{Channelcode: tempOrderInfo.Channel, ProductId: strconv.Itoa(int(tempOrderInfo.ProductId)), Bg: p.Backgroud_image, Button: p.PurhchaseBtn_image, Rule: p.Rule_image, Mask: p.MaskImage,RuleDesc:template.HTML(p.Prodcut_rule)}
 			locals["pageInfo"] = pageInfo
 			util.RenderHtml(w, "index.html", locals)
@@ -49,7 +49,7 @@ func HandlerWeChatLoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		} else {
 			locals := make(map[string]interface{})
-			p:=dal.GetProductInfo(tempOrderInfo.ProductId)
+			p:=dal.GetProductInfo(tempOrderInfo.ProductId,true)
 			pageInfo := PageInfo{Channelcode: tempOrderInfo.Channel, ProductId: strconv.Itoa(int(tempOrderInfo.ProductId)), Bg: p.Backgroud_image, Button: p.PurhchaseBtn_image, Rule: p.Rule_image, Mask: p.MaskImage,RuleDesc:template.HTML(p.Prodcut_rule)}
 			locals["pageInfo"] = pageInfo
 			util.RenderHtml(w, "index.html", locals)

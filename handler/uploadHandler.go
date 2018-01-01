@@ -5,35 +5,53 @@ import (
 	"io"
 	"os"
 	"beautyfarm4market/util"
+	"path"
+	"beautyfarm4market/entity"
+	"encoding/json"
 )
 
-func UploadHandler(w http.ResponseWriter,r *http.Request)  {
-	if r.Method == "GET" {
-		util.RenderHtml(w,"upload.html",nil)
-		return
-	}
-
-	if r.Method=="POST" {
-		f,h,err:=r.FormFile("image")
-		if err!=nil {
-			http.Error(w,err.Error(),http.StatusInternalServerError)
+func UploadHandler(w http.ResponseWriter, r *http.Request) {
+	res := entity.GetBaseFailRes();
+	if r.Method == "POST" {
+		w.Header().Set("Content-Type", "application/json;charset=utf-8")
+		f, h, err := r.FormFile("image")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		filename:=h.Filename
+		filename := r.FormValue("fileName") + path.Ext(h.Filename)
+		if filename == "" {
+			filename = h.Filename
+		}
 		defer f.Close()
-
-		t,err :=os.Create(UPLOAD_DRI+filename)
-		if err!=nil {
-			http.Error(w,err.Error(),http.StatusInternalServerError)
+		path := util.GetCurrentPath() + "/html/images/" + filename;
+		if isExist, _ := PathExists(path); isExist {
+			os.Remove(path)
+		}
+		t, err := os.Create(path)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		defer t.Close()
-		if _,err:=io.Copy(t,f);err!=nil {
-			http.Error(w,err.Error(),http.StatusInternalServerError)
+		if _, err := io.Copy(t, f); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-
-		http.Redirect(w,r,"/view?id="+filename,http.StatusFound)
+		res.IsSucess = true
+		res.Message = filename
 	}
+	json.NewEncoder(w).Encode(res)
+}
+
+func PathExists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return false, err
 }
