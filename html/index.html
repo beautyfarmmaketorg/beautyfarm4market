@@ -1,10 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <div id='wx_pic' style='margin:0 auto;display:none;'>
+        <img src='assets/images/liutao.jpg' />
+    </div>
+    <meta name="description" content="{{$.pageInfo.ProductDesc }}">
     <meta charset="UTF-8" name="viewport"
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <meta name="description" content="不是所有选择都很难！">
+    <meta name="keywords" content="不是所有选择都很难！">
     <title>{{$.pageInfo.ProductName}}</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="shortcut icon" href="assets/images/favicon.ico">
     <style>
         body, main::before {
             background: url(assets/images/{{$.pageInfo.Bg}}) no-repeat center center;
@@ -44,6 +51,9 @@
         }
     </style>
 
+{{ $specialId :="7" }}
+
+{{if eq $.pageInfo.ProductId $specialId }}
     <script type="text/javascript">
         (function (root) {
             root._tt_config = true;
@@ -63,6 +73,8 @@
             s.parentNode.insertBefore(ta, s);
         })(window);
     </script>
+{{end}}
+
 </head>
 <body>
 <main>
@@ -150,6 +162,10 @@
     var obj_info2 = document.getElementById('alert-info2');
 
     function alertPurchase() {
+        var productIdObj = document.getElementById('productId');
+        if (productIdObj.value == "7") {
+            _taq.push({convert_id: "83330938282", event_type: "button"});
+        }
         addClass(obj_pur, "show");
     }
 
@@ -210,5 +226,57 @@
 <script src="assets/js/zepto.min.js" language="javascript"></script>
 <script src="assets/js/zeptocookie.js" language="javascript"></script>
 <script src="assets/js/index.js" language="javascript"></script>
+
+<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+
+<script type="text/javascript">
+    //alert(location.href.split('#')[0]);
+    wx.config({
+        debug: false,
+        appId: '{{$.sign.AppId}}',
+        timestamp:{{$.sign.TimeStamp}},
+        nonceStr: '{{$.sign.NonceStr}}',
+        signature: '{{$.sign.PaySign}}',
+        jsApiList: ["onMenuShareAppMessage","onMenuShareTimeline"] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+    });
+
+    wx.ready(function(){
+        wx.onMenuShareAppMessage({
+            title: '【美丽田园】{{$.pageInfo.ProductName}}', // 分享标题
+            desc: '{{$.pageInfo.ProductDesc }}', // 分享描述
+            link: '{{$.pageInfo.PageUrl }}', // 分享链接
+            imgUrl: '{{$.pageInfo.ShareImage }}', // 分享图标
+            type: '', // 分享类型,music、video或link，不填默认为link
+            dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+            success: function () {
+
+            },
+            cancel: function () {
+
+            }
+        });
+
+        wx.onMenuShareTimeline({
+            title: '【美丽田园】{{$.pageInfo.ProductName}}', // 分享标题
+            desc: '{{$.pageInfo.ProductDesc}}',
+            link: '{{$.pageInfo.PageUrl }}', // 分享链接
+            imgUrl:'{{$.pageInfo.ShareImage }}', // 分享图标
+            success: function () {
+                // 用户确认分享后执行的回调函数
+            },
+            cancel: function () {
+                // 用户取消分享后执行的回调函数
+            }
+        });
+
+    });
+
+    wx.error(function(res){
+        alert(res);
+    });
+
+</script>
+
+
 </body>
 </html>

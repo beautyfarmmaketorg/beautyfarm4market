@@ -106,7 +106,7 @@ func getSign(e wechatPayEntity) string {
 	sort.Strings(sorted_keys)
 	var signStrings string
 	for _, k := range sorted_keys {
-		fmt.Printf("k=%v, v=%v\n", k, m[k])
+		//fmt.Printf("k=%v, v=%v\n", k, m[k])
 		value := fmt.Sprintf("%v", m[k])
 		if value != "" {
 			signStrings = signStrings + k + "=" + value + "&"

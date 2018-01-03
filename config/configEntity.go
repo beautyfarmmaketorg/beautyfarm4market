@@ -38,6 +38,8 @@ type configEntity struct {
 	WeChatAppId         string //微信公众号appid
 	WeChatAuthUrl       string //获取openid
 	WeChatSecret        string //微信秘钥
+	WeChatTokenUrl      string
+	WeChatTicketUrl     string
 	ProxyDir            string
 	Version             string
 	Dbname              string
@@ -79,6 +81,8 @@ func init() {
 		ProxyDir:            "beautyfarm4market",
 		Version:             "v1",
 		Dbname:              cfg.Dbname,
+		WeChatTokenUrl:      "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s",
+		WeChatTicketUrl:     "https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=%s&type=jsapi",
 	}
 	fmt.Printf("init Config")
 }
@@ -87,7 +91,7 @@ type ConfigFromXml struct {
 	Dbname          string `xml:"dbname"`
 	PosService      string `xml:"posService"`
 	OrderServiceUrl string `xml:"orderServiceUrl"`
-	Port string `xml:"port"`
+	Port            string `xml:"port"`
 }
 
 func GetConfigFromXml() ConfigFromXml {
