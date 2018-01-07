@@ -3,7 +3,6 @@ package proxy
 import (
 	"net/http"
 	"io/ioutil"
-	"fmt"
 	"strings"
 	"mahonia"
 	"strconv"
@@ -18,7 +17,7 @@ func SendMsg(mobile string,content string)bool {
 		defer response.Body.Close()
 		if body,err:=ioutil.ReadAll(response.Body);err==nil {
 			isSucess=checkSendMsgRes(string(body))
-			fmt.Println(string(body));
+			//fmt.Println(string(body));
 		}
 	}
 	return isSucess

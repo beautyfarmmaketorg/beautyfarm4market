@@ -16,6 +16,7 @@ const (
 	dbpassword = "Beautyfarm886633" //密码
 )
 
+var ViewLogList []ViewLog = []ViewLog{}
 var dbconnection *sql.DB
 
 func init() {
@@ -27,7 +28,7 @@ func init() {
 
 func checkErr(err error) {
 	if err != nil {
-		panic(err)
+		//panic(err)
 	}
 }
 
@@ -187,9 +188,8 @@ type LogInfo struct {
 
 func AddLog(log LogInfo) bool {
 	//插入数据
-	stmt, err := dbconnection.Prepare("INSERT log SET title=?,description=?,logType=?")
-	checkErr(err)
-	res, err := stmt.Exec(log.Title, log.Description, log.Type)
+	sql := "INSERT log SET title=?,description=?,logType=?"
+	res, err := dbconnection.Exec(sql,log.Title, log.Description, log.Type)
 	checkErr(err)
 	rows, _ := res.RowsAffected()
 	return rows > 0
@@ -320,9 +320,8 @@ type ViewLog struct {
 
 func AddViewLog(v ViewLog) bool {
 	//插入数据
-	stmt, err := dbconnection.Prepare("INSERT page_view SET pange_url=?,client_ip=?,channel_code=?")
-	checkErr(err)
-	res, err := stmt.Exec(v.Pange_url, v.Client_ip, v.Channel_code)
+	query := "INSERT page_view SET pange_url=?,client_ip=?,channel_code=?"
+	res, err := dbconnection.Exec(query, v.Pange_url, v.Client_ip, v.Channel_code)
 	checkErr(err)
 	rows, _ := res.RowsAffected()
 	return rows > 0

@@ -28,7 +28,14 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		pageUrl := "http://" + r.Host + r.RequestURI
 		dal.AddViewLog(dal.ViewLog{Channel_code: channelcode, Pange_url: pageUrl, Client_ip: clientIp})
 		if err == nil {
-			p := dal.GetProductInfo(productId, true)
+			var p dal.ProductInfo
+			cacheValue := util.GetCache(productIdStr)
+			if cacheValue == nil {
+				p = dal.GetProductInfo(productId, true)
+				util.SetCache(productIdStr, p)
+			} else {
+				p = cacheValue.(dal.ProductInfo)
+			}
 			if p.Product_id == 0 {
 				util.RenderHtml(w, "notfound.html", nil)
 				return

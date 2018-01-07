@@ -57,7 +57,7 @@ func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
 			clientIp = arr[0]
 		}
 	}
-	fmt.Printf("clientIp:", clientIp);
+	//fmt.Printf("clientIp:", clientIp);
 	//检查是否已经下过订单
 	if hasOrdered := checkHasOrdered(mobileNo, productCode); hasOrdered {
 		result.Code = "1" //

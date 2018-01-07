@@ -36,7 +36,7 @@ func PayCallBackHandler(w http.ResponseWriter, r *http.Request) {
 				payCallBackRes.ReturnCode = "SUCCESS"
 				payCallBackRes.ReturnMsg = "OK"
 			}
-			fmt.Println(string(body))
+			//fmt.Println(string(body))
 			dal.AddLog(dal.LogInfo{Title: "payCallBackRes" + mappingOrderNo, Description: string(body), Type: 1})
 		}
 	}
@@ -118,7 +118,7 @@ func getSign(e wechatPayEntity) string {
 
 func check(e error) {
 	if e != nil {
-		panic(e)
+		//panic(e)
 	}
 }
 

@@ -16,7 +16,7 @@ func init()  {
 	absoluteViewsDir:=GetCurrentPath()+VIEW_DRI
 	fileInfoArr,err:=ioutil.ReadDir(absoluteViewsDir)
 	if err!=nil {
-		panic(err)
+		//panic(err)
 		return
 	}
 	var templateName,templatePath string
