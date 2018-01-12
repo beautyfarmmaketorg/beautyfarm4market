@@ -11,9 +11,9 @@ import (
 	"strings"
 	"beautyfarm4market/util"
 	"encoding/xml"
-	"net/http"
 	"bytes"
 	"io/ioutil"
+	"beautyfarm4market/proxy"
 )
 
 //获取订单号待实现
@@ -54,7 +54,8 @@ func Refund(mappingOrderNo string, remark string) entity.BaseResultEntity {
 	xmlStr, _ := xml.Marshal(weChatRefundReq);
 	fmt.Printf(string(xmlStr))
 	dal.AddLog(dal.LogInfo{Title: "RefundxmlReq" + mappingOrderNo, Description: string(xmlStr), Type: 1})
-	if response, postErr := http.Post(config.ConfigInfo.WeRefundUrl, "text/plain", bytes.NewBuffer([]byte(xmlStr)));postErr==nil{
+	httpClient := proxy.GetClientWithCa("", config.ConfigInfo.WeChatMchId)
+	if response, postErr := httpClient.Post(config.ConfigInfo.WeRefundUrl, "text/plain", bytes.NewBuffer([]byte(xmlStr))); postErr == nil {
 		defer response.Body.Close()
 		check(postErr)
 		weChatRefundRes := WeChatRefundRes{}
@@ -91,9 +92,9 @@ type WeChatRefundReq struct {
 	Mch_id         string `xml:"mch_id"`
 	Nonce_str      string `xml:"nonce_str"`
 	Out_refund_no  string `xml:"out_refund_no"`
-	Refund_fee     int `xml:"refund_fee"`
+	Refund_fee     int    `xml:"refund_fee"`
 	Refund_desc    string `xml:"refund_desc"`
-	Total_fee      int `xml:"total_fee"`
+	Total_fee      int    `xml:"total_fee"`
 	Transaction_id string `xml:"transaction_id"`
 	Sign           string `xml:"sign"`
 }

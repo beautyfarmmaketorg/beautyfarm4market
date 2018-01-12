@@ -7,6 +7,8 @@ import (
 	"bytes"
 	"io/ioutil"
 	"fmt"
+	"crypto/tls"
+	"crypto/x509"
 )
 
 func httpPostProxy(url string, req interface{}, res interface{}) entity.BaseResultEntity {
@@ -52,4 +54,27 @@ func httpGetProxy(url string, res interface{}) entity.BaseResultEntity {
 		return entity.GetBaseSucessRes()
 	}
 	return baseRes
+}
+
+func GetClientWithCa(rootCa, rootKey string) *http.Client {
+	var tr *http.Transport
+	certs, err := tls.LoadX509KeyPair(rootCa, rootKey)
+	if err != nil {
+		tr = &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+	} else {
+		ca, err := x509.ParseCertificate(certs.Certificate[0])
+		if err != nil {
+			return &http.Client{Transport: tr}
+		}
+		pool := x509.NewCertPool()
+		pool.AddCert(ca)
+
+		tr = &http.Transport{
+			TLSClientConfig: &tls.Config{RootCAs: pool},
+		}
+
+	}
+	return &http.Client{Transport: tr}
 }
