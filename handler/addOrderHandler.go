@@ -12,6 +12,7 @@ import (
 	"time"
 	"strings"
 	"net/url"
+	"beautyfarm4market/bll"
 )
 
 func AddOrderHandler(w http.ResponseWriter, r *http.Request) {
@@ -114,7 +115,7 @@ type AddOrderResponse struct {
 //添加临时单
 func addTempOrder(userName string, mobile string, productId int64, accountNo string, channel string, clientIp string) (t dal.TempOrder, res entity.BaseResultEntity) {
 	res = entity.GetBaseSucessRes()
-	mappingOrderNo := getMappingOrderNo()
+	mappingOrderNo := bll.GetOrderNo("BZ")
 	p := dal.GetProductInfo(productId,true)
 	t = dal.TempOrder{
 		MappingOrderNo: mappingOrderNo,
@@ -202,12 +203,7 @@ func addFinalOrder(userName string, mobile string, productCode string, accountNo
 	return result
 }
 
-//获取订单号待实现
-func getMappingOrderNo() string {
-	t := time.Now()
-	timestamp := strconv.FormatInt(t.UTC().UnixNano(), 10)
-	return "P" + timestamp
-}
+
 
 func sendOrderSucessMessage(cardNo, productName, mobileNo string) bool {
 	smsContent := fmt.Sprintf(config.ConfigInfo.SmsOfOrderSucess, productName, cardNo)

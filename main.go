@@ -6,9 +6,21 @@ import (
 	"log"
 	_ "beautyfarm4market/config"
 	"beautyfarm4market/config"
+	"beautyfarm4market/proxy"
+	"beautyfarm4market/bll"
+	"fmt"
 )
 
 func main() {
+	cancelRes, serviceRes := proxy.CancelSoaOrder("BZ1515723284147993500")
+	if serviceRes.IsSucess && cancelRes.ErrorCode == "200" {
+		fmt.Printf("取消院余成功")
+	} else {
+		fmt.Printf(cancelRes.ErrorMessage)
+	}
+	refundRes:=bll.Refund("BZ1515723284147993500","测试取消")
+	fmt.Printf(refundRes.Message)
+	fmt.Printf(cancelRes.OrderNo, serviceRes.Message)
 	cfg := config.GetConfigFromXml()
 	mux := http.NewServeMux()
 	handler.StaticDirHandler(mux, "/assets/", 0)

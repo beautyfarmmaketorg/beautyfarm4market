@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"bytes"
 	"io/ioutil"
+	"fmt"
 )
 
 func httpPostProxy(url string, req interface{}, res interface{}) entity.BaseResultEntity {
@@ -16,8 +17,8 @@ func httpPostProxy(url string, req interface{}, res interface{}) entity.BaseResu
 		baseRes.Message = err.Error()
 		return baseRes
 	}
-	//jsonStr := string(jsonObj)
-	//fmt.Printf(jsonStr)
+	jsonStr := string(jsonObj)
+	fmt.Printf(jsonStr)
 	response, postErr := http.Post(url, "application/json", bytes.NewBuffer([]byte(jsonObj)))
 	defer response.Body.Close()
 	if postErr != nil {
@@ -30,6 +31,7 @@ func httpPostProxy(url string, req interface{}, res interface{}) entity.BaseResu
 	}
 	body, _ := ioutil.ReadAll(response.Body)
 	s := string(body)
+	fmt.Printf(s)
 	json.Unmarshal([]byte(s), res);
 	return baseRes
 }

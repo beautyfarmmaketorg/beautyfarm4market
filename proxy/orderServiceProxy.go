@@ -11,10 +11,52 @@ import (
 func AddSoaOrder(mappingOrderNo string, accountNo string) (soaAddOrderResOut SoaAddOrderRes, baseResultEntity entity.BaseResultEntity) {
 	var soaAddOrderRes SoaAddOrderRes
 	soaAddOrderReq := getSoaAddOrderReq(mappingOrderNo, accountNo)
-	url := fmt.Sprintf(config.ConfigInfo.OrderServiceUrl, config.ConfigInfo.AddOrderUrl)
+	url := fmt.Sprintf(config.ConfigInfo.OrderServiceUrl, config.ConfigInfo.AddOrUpdateOrderUrl)
 	baseResultEntity = httpPostProxy(url, soaAddOrderReq, &soaAddOrderRes)
 	soaAddOrderResOut = soaAddOrderRes
 	return
+}
+
+func CancelSoaOrder(mappingOrderNo string) (cancelSoaOrderResOut CancelSoaOrderRes, baseResultEntity entity.BaseResultEntity) {
+	baseResultEntity = entity.GetBaseFailRes()
+	c := config.ConfigInfo
+	tempOrderInfo := dal.GetOrdersByMappingOrderNo(mappingOrderNo)
+	if tempOrderInfo.MappingOrderNo == "" {
+		baseResultEntity.Message = "订单不存在"
+		return
+	}
+	cancelSoaOrderReq := CancelSoaOrderReq{
+		AppId:          c.OrderServiceAppId,
+		ModifyType:     "3",
+		MappingOrderNo: mappingOrderNo,
+		OrderNo:        tempOrderInfo.OrderNo,
+		AccountNo:      tempOrderInfo.AccountNo,
+		Channel:        c.Channel,
+		OrderType:      "2",
+		OrderStatus:    "7",
+	}
+	url := fmt.Sprintf(config.ConfigInfo.OrderServiceUrl, config.ConfigInfo.AddOrUpdateOrderUrl)
+	var cancelSoaOrderRes CancelSoaOrderRes
+	baseResultEntity = httpPostProxy(url, cancelSoaOrderReq, &cancelSoaOrderRes)
+	cancelSoaOrderResOut = cancelSoaOrderRes
+	return
+}
+
+type CancelSoaOrderReq struct {
+	AppId          string `json:"appId"`
+	ModifyType     string `json:"modifyType"`
+	MappingOrderNo string `json:"mappingOrderNo"`
+	OrderNo        string `json:"orderNo"`
+	AccountNo      string `json:"accountNo"`
+	Channel        string `json:"channel"`
+	OrderType      string `json:"orderType"`
+	OrderStatus    string `json:"orderStatus"`
+}
+
+type CancelSoaOrderRes struct {
+	SoaBaseRes4Orderservice
+	OrderNo        string `json:"orderNo"`
+	MappingOrderNo string `json:"mappingOrderNo"`
 }
 
 //获取下单请求

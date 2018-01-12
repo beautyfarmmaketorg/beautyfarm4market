@@ -92,6 +92,17 @@ func UpdateTempOrderPayStatus(mappingOrderNo string, payStatus int) bool {
 	return rows > 0
 }
 
+//更新订单状态
+func UpdateTempOrderStatus(mappingOrderNo string, payStatus int,orderStatus int ) bool {
+	//插入数据
+	stmt, err := dbconnection.Prepare("UPDATE temp_order SET modify_date=NOW(),pay_status=?,order_status=? where mappingOrder_no=?")
+	checkErr(err)
+	res, err := stmt.Exec(payStatus,orderStatus, mappingOrderNo)
+	checkErr(err)
+	rows, _ := res.RowsAffected()
+	return rows > 0
+}
+
 func GetAllOrders() []TempOrder {
 	//查询数据
 	rows, err := dbconnection.Query("SELECT * FROM temp_order")

@@ -12,7 +12,7 @@ var ConfigInfo configEntity
 type configEntity struct {
 	SmsUrl              string
 	OrderServiceUrl     string
-	AddOrderUrl         string
+	AddOrUpdateOrderUrl         string
 	AccountRegisterUrl  string
 	OrderServiceAppId   string
 	AccountNo           string
@@ -38,11 +38,13 @@ type configEntity struct {
 	WeChatAppId         string //微信公众号appid
 	WeChatAuthUrl       string //获取openid
 	WeChatSecret        string //微信秘钥
+	WeChatMchId         string //微信商户号
 	WeChatTokenUrl      string
 	WeChatTicketUrl     string
 	ProxyDir            string
 	Version             string
 	Dbname              string
+	WeRefundUrl         string //微信退款
 }
 
 func init() {
@@ -51,7 +53,7 @@ func init() {
 		SmsUrl: "http://esms10.10690007.net/sms/mt",
 		//下单接口配置
 		OrderServiceUrl:    cfg.OrderServiceUrl,
-		AddOrderUrl:        "order/orderInsertOrUpdate",
+		AddOrUpdateOrderUrl:        "order/orderInsertOrUpdate",
 		GetOrderDetailUrl:  "order/orderDetailSelect?orderList=%s&appId=%s",
 		AccountRegisterUrl: "account/accountRegister",
 		GetAccountInfoUrl:  "account/accountListSelect?phone=%s",
@@ -78,11 +80,13 @@ func init() {
 		WeChatAppId:         "wx7302aaa9857c055b",
 		WeChatAuthUrl:       "https://api.weixin.qq.com/sns/oauth2/access_token?appid=?&secret=?&code=?&grant_type=authorization_code",
 		WeChatSecret:        "077cb94b72154e7b3d7db95ba40a83cb",
+		WeChatMchId:         "1301086301",
 		ProxyDir:            "beautyfarm4market",
 		Version:             "v1",
 		Dbname:              cfg.Dbname,
 		WeChatTokenUrl:      "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s",
 		WeChatTicketUrl:     "https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=%s&type=jsapi",
+		WeRefundUrl:         "https://api.mch.weixin.qq.com/secapi/pay/refund",
 	}
 	fmt.Printf("init Config")
 }
