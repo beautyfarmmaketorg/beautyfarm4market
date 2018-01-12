@@ -32,7 +32,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 			cacheValue := util.GetCache(productIdStr)
 			if cacheValue == nil {
 				p = dal.GetProductInfo(productId, true)
-				util.SetCache(productIdStr, p)
+				util.SetCache(productIdStr, p,10*time.Minute)
 			} else {
 				p = cacheValue.(dal.ProductInfo)
 			}

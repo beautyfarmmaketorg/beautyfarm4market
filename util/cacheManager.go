@@ -11,8 +11,8 @@ func init() {
 	currentCache = cache.New(60*time.Minute, 30*time.Second)
 }
 
-func SetCache(key string, value interface{}) {
-	currentCache.Set(key, value, cache.DefaultExpiration)
+func SetCache(key string, value interface{}, d time.Duration) {
+	currentCache.Set(key, value, d)
 }
 
 func GetCache(key string) interface{} {

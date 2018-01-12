@@ -17,7 +17,7 @@ func AddSoaOrder(mappingOrderNo string, accountNo string) (soaAddOrderResOut Soa
 	return
 }
 
-func CancelSoaOrder(mappingOrderNo string) (cancelSoaOrderResOut CancelSoaOrderRes, baseResultEntity entity.BaseResultEntity) {
+func CancelSoaOrder(mappingOrderNo string,cancelmappingOrderNo string) (cancelSoaOrderResOut CancelSoaOrderRes, baseResultEntity entity.BaseResultEntity) {
 	baseResultEntity = entity.GetBaseFailRes()
 	c := config.ConfigInfo
 	tempOrderInfo := dal.GetOrdersByMappingOrderNo(mappingOrderNo)
@@ -27,13 +27,36 @@ func CancelSoaOrder(mappingOrderNo string) (cancelSoaOrderResOut CancelSoaOrderR
 	}
 	cancelSoaOrderReq := CancelSoaOrderReq{
 		AppId:          c.OrderServiceAppId,
-		ModifyType:     "3",
-		MappingOrderNo: mappingOrderNo,
-		OrderNo:        tempOrderInfo.OrderNo,
+		ModifyType:     "1",
+		MappingOrderNo: cancelmappingOrderNo,
 		AccountNo:      tempOrderInfo.AccountNo,
 		Channel:        c.Channel,
-		OrderType:      "2",
-		OrderStatus:    "7",
+		OrderType:      "3",
+		OrderStatus:    "6",
+		DetailList: []SoaProductDetail{
+			{
+				DetailListNo: "01",
+				ProdCategory: "32",
+				ProdNo:       tempOrderInfo.ProductCode,
+				ProdName:     tempOrderInfo.ProductName,
+				ProdUnit:     "件",
+				OrderQty:     "-1",
+				ProdPrice:    strconv.FormatFloat(tempOrderInfo.OrignalPrice, 'f', 2, 64),
+				ProdAmt:      strconv.FormatFloat(-tempOrderInfo.OrignalPrice, 'f', 2, 64),
+				OrderPrice:   strconv.FormatFloat(tempOrderInfo.TotalPrice, 'f', 2, 64),
+				OrderAmt:     strconv.FormatFloat(-tempOrderInfo.TotalPrice, 'f', 2, 64),
+				PayList: []SoaPayInfoDetail{
+					{
+						PayNo:       mappingOrderNo,
+						PayCategory: "3",
+						PayType:     "第三方支付",
+						PayAmt:      strconv.FormatFloat(-tempOrderInfo.TotalPrice, 'f', 2, 64),
+						PayTimes:    "-1",
+					},
+				},
+				CardNo: tempOrderInfo.CardNo,
+			},
+		},
 	}
 	url := fmt.Sprintf(config.ConfigInfo.OrderServiceUrl, config.ConfigInfo.AddOrUpdateOrderUrl)
 	var cancelSoaOrderRes CancelSoaOrderRes
@@ -43,14 +66,15 @@ func CancelSoaOrder(mappingOrderNo string) (cancelSoaOrderResOut CancelSoaOrderR
 }
 
 type CancelSoaOrderReq struct {
-	AppId          string `json:"appId"`
-	ModifyType     string `json:"modifyType"`
-	MappingOrderNo string `json:"mappingOrderNo"`
-	OrderNo        string `json:"orderNo"`
-	AccountNo      string `json:"accountNo"`
-	Channel        string `json:"channel"`
-	OrderType      string `json:"orderType"`
-	OrderStatus    string `json:"orderStatus"`
+	AppId          string             `json:"appId"`
+	ModifyType     string             `json:"modifyType"`
+	MappingOrderNo string             `json:"mappingOrderNo"`
+	OrderNo        string             `json:"orderNo"`
+	AccountNo      string             `json:"accountNo"`
+	Channel        string             `json:"channel"`
+	OrderType      string             `json:"orderType"`
+	OrderStatus    string             `json:"orderStatus"`
+	DetailList     []SoaProductDetail `json:"detailList"`
 }
 
 type CancelSoaOrderRes struct {

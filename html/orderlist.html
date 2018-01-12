@@ -17,50 +17,89 @@
         </div>
     </div>
 </nav>
-<table class="table table-striped" style="margin-top: 30px;">
-    <caption>订单列表</caption>
-    <thead>
-    <tr>
-        <th>本地订单号</th>
-        <th>code</th>
-        <th>名称</th>
-        <th>手机</th>
-        <th>姓名</th>
-        <th>账号</th>
-        <th>总价</th>
-        <th title="订单状态 1 已下临时单  2 已下正式单 3取消">订单状态</th>
-        <th title="支付状态 0未支付 1 支付中 2已支付  已退款">支付状态</th>
-        <th>CAM订单号</th>
-        <th>院余号</th>
-        <th>微信订单号</th>
-        <th>渠道</th>
-        <th>下单日期</th>
-        <th>最后更新</th>
-    </tr>
-    </thead>
-    <tbody>
-    {{range $.orders}}
-    <tr>
-        <td>{{.MappingOrderNo}}</td>
-        <td>{{.ProductCode}}</td>
-        <td>{{.ProductName}}</td>
-        <td>{{.MobileNo}}</td>
-        <td>{{.UserName}}</td>
-        <td>{{.AccountNo}}</td>
-        <td>{{.TotalPrice}}</td>
-        <td>{{.OrderStatus}}</td>
-        <td>{{.PayStatus}}</td>
-        <td>{{.OrderNo}}</td>
-        <td>{{.CardNo}}</td>
-        <td>{{.WechatorderNo}}</td>
-        <td>{{.Channel}}</td>
-        <td>{{.CreateDate}}</td>
-        <td>{{.ModifyDate}}</td>
-    </tr>
-    {{end}}
-    </tbody>
-</table>
+<div style="margin-top: 100px">
+    <form action="/orderList" method="get">
+        <p><label>姓名:</label><input type="text" name="name" value="{{ $.args.Name}}"/>
+            <label>手机:</label><input type="text" name="mobile" value="{{ $.args.Mobile}}"/>
+            <label>订单号:</label><input type="text" name="mappingOrderno" value="{{ $.args.MappingOrderno}}"/>
+            <label>支付id:</label><input type="text" name="wechatorderno" value="{{ $.args.Wechatorderno}}"/>
+            <label>院余号:</label><input type="text" name="cardno" value="{{ $.args.Cardno}}"/><input type="submit"
+                                                                                                   value="查询"/></p>
+    </form>
+    <p><label>订单总量：</label><span>{{ $.args.Total}}</span></p>
+</div>
+<div id="table_content">
+    <table class="table table-striped" style="margin-top: 30px;">
+        <caption>订单列表</caption>
+        <thead>
+        <tr>
+            <th>操作</th>
+            <th>本地订单号</th>
+            <th>code</th>
+            <th>名称</th>
+            <th>手机</th>
+            <th>姓名</th>
+            <th>账号</th>
+            <th>总价</th>
+            <th title="订单状态 1 已下临时单  2 已下正式单 3取消">订单状态</th>
+            <th title="支付状态 0未支付 1 支付中 2已支付  已退款">支付状态</th>
+            <th>CAM订单号</th>
+            <th>院余号</th>
+            <th>微信订单号</th>
+            <th>渠道</th>
+            <th>下单日期</th>
+            <th>最后更新</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{range $.orders}}
+        <tr>
+            <td>
+            {{if eq .OrderStatus 2}}
+                <input type="button" class="cancelBtn" data="{{.MappingOrderNo}}" value="取消院余"/>
+            {{end}}
+            {{if eq .PayStatus 2}}
+                <input type="button" class="refundBtn" data="{{.MappingOrderNo}}" value="退款"/>
+            {{end}}
+            </td>
+            <td>{{.MappingOrderNo}}</td>
+            <td>{{.ProductCode}}</td>
+            <td>{{.ProductName}}</td>
+            <td>{{.MobileNo}}</td>
+            <td>{{.UserName}}</td>
+            <td>{{.AccountNo}}</td>
+            <td>{{.TotalPrice}}</td>
+            <td>{{if eq .OrderStatus 1}}
+                临时单
+            {{else if eq .OrderStatus 2}}
+                正式单
+            {{else if eq .OrderStatus 3}}
+                取消
+            {{end}}
+            </td>
+            <td>{{if eq .PayStatus 0}}
+                未支付
+            {{else if eq .PayStatus 1}}
+                支付中
+            {{else if eq .PayStatus 2}}
+                已支付
+            {{else if eq .PayStatus 3}}
+                已退款
+            {{end}}
+            </td>
+            <td>{{.OrderNo}}</td>
+            <td>{{.CardNo}}</td>
+            <td>{{.WechatorderNo}}</td>
+            <td>{{.Channel}}</td>
+            <td>{{.CreateDate}}</td>
+            <td>{{.ModifyDate}}</td>
+        </tr>
+        {{end}}
+        </tbody>
+    </table>
+</div>
 <script src="assets/js/jquery.min.js" language="javascript"></script>
 <script src="assets/js/bootstrap.min.js" language="javascript"></script>
+<script src="assets/js/orderList.js" language="javascript"></script>
 </body>
 </html>

@@ -5,12 +5,15 @@ import (
 	"strconv"
 	"beautyfarm4market/dal"
 	"beautyfarm4market/entity"
-	"beautyfarm4market/proxy"
 	"beautyfarm4market/config"
 	"sort"
 	"fmt"
 	"strings"
 	"beautyfarm4market/util"
+	"encoding/xml"
+	"net/http"
+	"bytes"
+	"io/ioutil"
 )
 
 //获取订单号待实现
@@ -20,7 +23,7 @@ func GetOrderNo(prefix string) string {
 	return prefix + timestamp
 }
 
-func CancelOrder(orderNo string)entity.BaseResultEntity {
+func CancelOrder(orderNo string) entity.BaseResultEntity {
 	res := entity.GetBaseFailRes()
 	return res
 }
@@ -37,7 +40,7 @@ func Refund(mappingOrderNo string, remark string) entity.BaseResultEntity {
 		return res
 	}
 	c := config.ConfigInfo
-	weChatRefundReq := proxy.WeChatRefundReq{
+	weChatRefundReq := WeChatRefundReq{
 		Appid:          c.WeChatAppId,
 		Mch_id:         c.WeChatMchId,
 		Nonce_str:      strconv.FormatInt(time.Now().Unix(), 10),
@@ -47,19 +50,77 @@ func Refund(mappingOrderNo string, remark string) entity.BaseResultEntity {
 		Transaction_id: tempOrderInfo.WechatorderNo,
 	}
 	weChatRefundReq.Sign = getSign4WeChatRefund(weChatRefundReq)
-	if refundRes, serverRes := proxy.WeChatRefund(weChatRefundReq); serverRes.IsSucess {
-		if refundRes.Return_code == "SUCCESS" {
-			res.IsSucess = true
-			res.Message = "退款成功"
+
+	xmlStr, _ := xml.Marshal(weChatRefundReq);
+	fmt.Printf(string(xmlStr))
+	dal.AddLog(dal.LogInfo{Title: "RefundxmlReq" + mappingOrderNo, Description: string(xmlStr), Type: 1})
+	if response, postErr := http.Post(config.ConfigInfo.WeRefundUrl, "text/plain", bytes.NewBuffer([]byte(xmlStr)));postErr==nil{
+		defer response.Body.Close()
+		check(postErr)
+		weChatRefundRes := WeChatRefundRes{}
+		if response.StatusCode == 200 {
+			body, _ := ioutil.ReadAll(response.Body)
+			payResponseXml := string(body)
+			weChatRefundRes = convenrtWeChatRefundRes(payResponseXml)
+			if weChatRefundRes.Return_code == "SUCCESS" {
+				res.IsSucess = true
+				res.Message = "退款成功"
+				dal.UpdateTempOrderPayStatus(mappingOrderNo, 3)
+			} else {
+				res.Code = weChatRefundRes.Return_code
+				res.Message = weChatRefundRes.Return_msg
+			}
+			dal.AddLog(dal.LogInfo{Title: "weChatRefundRes_" + mappingOrderNo, Description: payResponseXml, Type: 1})
 		} else {
-			res.Code = refundRes.Return_code
-			res.Message = refundRes.Return_msg
+			res.Code = string(response.StatusCode)
+			res.Message = "其他错误"
 		}
 	}
 	return res
 }
 
-func getSign4WeChatRefund(e proxy.WeChatRefundReq) string {
+func convenrtWeChatRefundRes(xmlStr string) WeChatRefundRes {
+	v := WeChatRefundRes{}
+	err := xml.Unmarshal([]byte(xmlStr), &v)
+	check(err)
+	return v
+}
+
+type WeChatRefundReq struct {
+	Appid          string `xml:"appid"`
+	Mch_id         string `xml:"mch_id"`
+	Nonce_str      string `xml:"nonce_str"`
+	Out_refund_no  string `xml:"out_refund_no"`
+	Refund_fee     int `xml:"refund_fee"`
+	Refund_desc    string `xml:"refund_desc"`
+	Total_fee      int `xml:"total_fee"`
+	Transaction_id string `xml:"transaction_id"`
+	Sign           string `xml:"sign"`
+}
+
+type WeChatRefundRes struct {
+	Return_code    string `xml:"return_code"`
+	Return_msg     string `xml:"return_msg"`
+	Appid          string `xml:"appid"`
+	Mch_id         string `xml:"mch_id"`
+	Nonce_str      string `xml:"nonce_str"`
+	Sign           string `xml:"sign"`
+	Result_code    string `xml:"result_code"`
+	Transaction_id string `xml:"transaction_id"`
+	Out_trade_no   string `xml:"out_trade_no"`
+	Out_refund_no  string `xml:"out_refund_no"`
+	Refund_id      string `xml:"refund_id"`
+	Refund_channel string `xml:"refund_channel"`
+	Refund_fee     int    `xml:"refund_fee"`
+}
+
+func check(e error) {
+	if e != nil {
+		//panic(e)
+	}
+}
+
+func getSign4WeChatRefund(e WeChatRefundReq) string {
 	m := make(map[string]interface{}, 0)
 	m["appid"] = e.Appid
 	m["mch_id"] = e.Mch_id
