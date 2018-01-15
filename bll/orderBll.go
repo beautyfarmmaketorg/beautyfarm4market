@@ -54,8 +54,9 @@ func Refund(mappingOrderNo string, remark string) entity.BaseResultEntity {
 	xmlStr, _ := xml.Marshal(weChatRefundReq);
 	fmt.Printf(string(xmlStr))
 	dal.AddLog(dal.LogInfo{Title: "RefundxmlReq" + mappingOrderNo, Description: string(xmlStr), Type: 1})
-	httpClient := proxy.GetClientWithCa("", config.ConfigInfo.WeChatMchId)
-	if response, postErr := httpClient.Post(config.ConfigInfo.WeRefundUrl, "text/plain", bytes.NewBuffer([]byte(xmlStr))); postErr == nil {
+	httpClient := proxy.GetClientWithCa()
+	response, postErr := httpClient.Post(config.ConfigInfo.WeRefundUrl, "text/plain", bytes.NewBuffer([]byte(xmlStr)));
+	if postErr == nil {
 		defer response.Body.Close()
 		check(postErr)
 		weChatRefundRes := WeChatRefundRes{}
@@ -76,6 +77,8 @@ func Refund(mappingOrderNo string, remark string) entity.BaseResultEntity {
 			res.Code = string(response.StatusCode)
 			res.Message = "其他错误"
 		}
+	} else {
+		fmt.Println(postErr.Error())
 	}
 	return res
 }

@@ -56,25 +56,39 @@ func httpGetProxy(url string, res interface{}) entity.BaseResultEntity {
 	return baseRes
 }
 
-func GetClientWithCa(rootCa, rootKey string) *http.Client {
-	var tr *http.Transport
-	certs, err := tls.LoadX509KeyPair(rootCa, rootKey)
-	if err != nil {
-		tr = &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		}
-	} else {
-		ca, err := x509.ParseCertificate(certs.Certificate[0])
-		if err != nil {
-			return &http.Client{Transport: tr}
-		}
-		pool := x509.NewCertPool()
-		pool.AddCert(ca)
+var _tlsConfig *tls.Config
 
-		tr = &http.Transport{
-			TLSClientConfig: &tls.Config{RootCAs: pool},
-		}
+func getTLSConfig() (*tls.Config, error) {
+	if _tlsConfig != nil {
+		return _tlsConfig, nil
+	}
+
+	// load cert
+	cert, err := tls.LoadX509KeyPair("c://ca//apiclient_cert.pem", "c://ca//apiclient_key.pem")
+	if err != nil {
+		return nil, err
+	}
+
+	// load root ca
+	caData, err := ioutil.ReadFile("c://ca//rootca.pem")
+	if err != nil {
+		return nil, err
+	}
+	pool := x509.NewCertPool()
+	pool.AppendCertsFromPEM(caData)
+
+	_tlsConfig = &tls.Config{
+		Certificates: []tls.Certificate{cert},
+		RootCAs:      pool,
+	}
+	return _tlsConfig, nil
+}
+
+func GetClientWithCa() *http.Client {
+	tlsConfig, err := getTLSConfig()
+	if err != nil {
 
 	}
+	tr := &http.Transport{TLSClientConfig: tlsConfig}
 	return &http.Client{Transport: tr}
 }
