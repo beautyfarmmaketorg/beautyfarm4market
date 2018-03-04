@@ -20,4 +20,21 @@ $(function () {
         });
     })
 
+    $.datepicker.setDefaults({
+        dateFormat: "yy-mm-dd",
+    });
+
+    $("#beginDate").datepicker();
+    $("#endDate").datepicker();
+
+    var payStatus = $("#payStatusStrHidden").val();
+    if(payStatus!=""){
+        $("#payStatusSel").find("option[value='"+payStatus+"']").attr("selected",true);
+    }
+
+    var channel = $("#channelStrHidden").val();
+    if(channel!=""){
+        $("#ChannelSel").find("option[value='"+channel+"']").attr("selected",true);
+    }
+
 })

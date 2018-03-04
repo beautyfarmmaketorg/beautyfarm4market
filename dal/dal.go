@@ -93,7 +93,7 @@ func UpdateTempOrderPayStatus(mappingOrderNo string, payStatus int) bool {
 }
 
 //更新订单状态
-func UpdateTempOrderStatus(mappingOrderNo string,orderStatus int ) bool {
+func UpdateTempOrderStatus(mappingOrderNo string, orderStatus int) bool {
 	//插入数据
 	stmt, err := dbconnection.Prepare("UPDATE temp_order SET modify_date=NOW(),order_status=? where mappingOrder_no=?")
 	checkErr(err)
@@ -200,7 +200,7 @@ type LogInfo struct {
 func AddLog(log LogInfo) bool {
 	//插入数据
 	sql := "INSERT log SET title=?,description=?,logType=?"
-	res, err := dbconnection.Exec(sql,log.Title, log.Description, log.Type)
+	res, err := dbconnection.Exec(sql, log.Title, log.Description, log.Type)
 	checkErr(err)
 	rows, _ := res.RowsAffected()
 	return rows > 0
@@ -406,3 +406,22 @@ func toOrderReport(rows *sql.Rows) []OrderReportEntity {
 }
 
 /*订单统计*/
+
+/*获取所有渠道*/
+
+func GetAllChannel() []string {
+	//查询数据
+	rows, err := dbconnection.Query("SELECT DISTINCT channel from temp_order;")
+	checkErr(err)
+
+	var channelArr []string
+	for rows.Next() {
+		var channel string
+		errScan := rows.Scan(&channel)
+		checkErr(errScan)
+		channelArr = append(channelArr, channel)
+	}
+	return channelArr
+}
+
+/*获取所有渠道*/

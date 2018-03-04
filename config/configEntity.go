@@ -12,7 +12,7 @@ var ConfigInfo configEntity
 type configEntity struct {
 	SmsUrl              string
 	OrderServiceUrl     string
-	AddOrUpdateOrderUrl         string
+	AddOrUpdateOrderUrl string
 	AccountRegisterUrl  string
 	OrderServiceAppId   string
 	AccountNo           string
@@ -45,6 +45,7 @@ type configEntity struct {
 	Version             string
 	Dbname              string
 	WeRefundUrl         string //微信退款
+	DateLayout          string
 }
 
 func init() {
@@ -52,20 +53,21 @@ func init() {
 	ConfigInfo = configEntity{
 		SmsUrl: "http://esms10.10690007.net/sms/mt",
 		//下单接口配置
-		OrderServiceUrl:    cfg.OrderServiceUrl,
-		AddOrUpdateOrderUrl:        "order/orderInsertOrUpdate",
-		GetOrderDetailUrl:  "order/orderDetailSelect?orderList=%s&appId=%s",
-		AccountRegisterUrl: "account/accountRegister",
-		GetAccountInfoUrl:  "account/accountListSelect?phone=%s",
-		OrderServiceAppId:  "TEST",
-		AccountNo:          "129147",
-		Channel:            "XS0001",
+		OrderServiceUrl:     cfg.OrderServiceUrl,
+		AddOrUpdateOrderUrl: "order/orderInsertOrUpdate",
+		GetOrderDetailUrl:   "order/orderDetailSelect?orderList=%s&appId=%s",
+		AccountRegisterUrl:  "account/accountRegister",
+		GetAccountInfoUrl:   "account/accountListSelect?phone=%s",
+		OrderServiceAppId:   "TEST",
+		AccountNo:           "129147",
+		Channel:             "XS0001",
 		//下单接口配置END
 		SmsOfOrderSucess:    "您已成功购买%s，凭证号为：%s。请直接致电门店预约后到店护理或拨打4008206142预约咨询。",
 		SmsOfVaild:          "%s（美丽田园手机验证码，请完成验证）， 如非本人操作，请忽略本短信。",
 		MobileCookie:        "code%s",
 		CodeCookie:          "messagecode%s",
 		TimeLayout:          "2006-01-02 15:04:05",
+		DateLayout:          "2006-01-02",
 		RegisterChannelType: "3003",
 		PosService:          cfg.PosService,
 		IsVipUrl:            "customer/isVipMember?org_no=beautyfarm&mobile=%s&appid=%s&timestamp=%d&sign=%s",

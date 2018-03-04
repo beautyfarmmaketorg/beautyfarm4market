@@ -58,6 +58,10 @@ func CancelSoaOrder(mappingOrderNo string,cancelmappingOrderNo string) (cancelSo
 			},
 		},
 	}
+	newDetailList := appendOtherProducts(tempOrderInfo.ProductCode, mappingOrderNo, tempOrderInfo.CardNo, "-1",-1,"-1")
+	if len(newDetailList) > 0 {
+		cancelSoaOrderReq.DetailList = newDetailList;
+	}
 	url := fmt.Sprintf(config.ConfigInfo.OrderServiceUrl, config.ConfigInfo.AddOrUpdateOrderUrl)
 	var cancelSoaOrderRes CancelSoaOrderRes
 	baseResultEntity = httpPostProxy(url, cancelSoaOrderReq, &cancelSoaOrderRes)
@@ -118,7 +122,65 @@ func getSoaAddOrderReq(mappingOrderNo string, accountNo string) SoaOrderDetai {
 			},
 		},
 	}
+	newDetailList := appendOtherProducts(temporder.ProductCode, mappingOrderNo, "", "1",1,"1")
+	if len(newDetailList) > 0 {
+		soaAddOrderReq.DetailList = newDetailList;
+	}
+
 	return soaAddOrderReq
+}
+
+func appendOtherProducts(productCode string, mappingOrderNo string, cardNo string, payTimes string,positive float64,orderQty string ) []SoaProductDetail {
+	detailList := []SoaProductDetail{}
+	if productCode == "1180100125" {
+		detailList = []SoaProductDetail{
+			{
+				DetailListNo: "01",
+				ProdCategory: "32",
+				ProdNo:       "1180100125",
+				ProdName:     "平衡修复水氧护理",
+				ProdUnit:     "件",
+				OrderQty:     orderQty,
+				ProdPrice:    strconv.FormatFloat(980, 'f', 2, 64),
+				ProdAmt:      strconv.FormatFloat(980*positive, 'f', 2, 64),
+				OrderPrice:   strconv.FormatFloat(213, 'f', 2, 64),
+				OrderAmt:     strconv.FormatFloat(213*positive, 'f', 2, 64),
+				PayList: []SoaPayInfoDetail{
+					{
+						PayNo:       mappingOrderNo,
+						PayCategory: "3",
+						PayType:     "第三方支付",
+						PayAmt:      strconv.FormatFloat(213*positive, 'f', 2, 64),
+						PayTimes:    payTimes,
+					},
+				},
+				CardNo: cardNo,
+			},
+			{
+				DetailListNo: "02",
+				ProdCategory: "32",
+				ProdNo:       "1130600001",
+				ProdName:     "芳香精油能量按摩",
+				ProdUnit:     "件",
+				OrderQty:     orderQty,
+				ProdPrice:    strconv.FormatFloat(480, 'f', 2, 64),
+				ProdAmt:      strconv.FormatFloat(480*positive, 'f', 2, 64),
+				OrderPrice:   strconv.FormatFloat(105, 'f', 2, 64),
+				OrderAmt:     strconv.FormatFloat(105*positive, 'f', 2, 64),
+				PayList: []SoaPayInfoDetail{
+					{
+						PayNo:       mappingOrderNo,
+						PayCategory: "3",
+						PayType:     "第三方支付",
+						PayAmt:      strconv.FormatFloat(105*positive, 'f', 2, 64),
+						PayTimes:    payTimes,
+					},
+				},
+				CardNo: cardNo,
+			},
+		}
+	}
+	return detailList
 }
 
 //订单服务共有请求字段
